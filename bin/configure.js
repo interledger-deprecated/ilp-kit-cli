@@ -58,7 +58,7 @@ configurations.bells = (config) => {
 
 configurations.virtual = (config) => {
   config.asset = config.asset || 'USD'
-  config.id = config.id || 'FILL IN: ledger id URI'
+  config.id = config.id || 'http://virtual-ledger.example'
   config.username = config.username || 'doesnt matter'
   config.password = config.password || 'doesnt matter'
   config.account = config.host || 'nerd'
