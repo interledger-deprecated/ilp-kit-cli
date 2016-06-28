@@ -1,7 +1,7 @@
 {
-  "name": "nerd-client",
+  "name": "ilp-connector-cli",
   "version": "1.0.0",
-  "description": "Simple tools to create trustlines",
+  "description": "Simple tools start ILP connectors",
   "main": "index.js",
   "dependencies": {
     "five-bells-connector": "^7.0.3",
@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "nerd-config": "bin/configure.js",
-    "nerd-run": "bin/run.js"
+    "ilp-connector-config": "bin/configure.js",
+    "ilp-connector-run": "bin/run.js"
   }
 }
