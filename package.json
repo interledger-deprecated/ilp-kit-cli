@@ -1,0 +1,20 @@
+{
+  "name": "nerd-client",
+  "version": "1.0.0",
+  "description": "Simple tools to create trustlines",
+  "main": "index.js",
+  "dependencies": {
+    "five-bells-connector": "^7.0.3",
+    "argparse": "^1.0.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "nerd-config": "bin/configure.js",
+    "nerd-run": "bin/run.js"
+  }
+}
