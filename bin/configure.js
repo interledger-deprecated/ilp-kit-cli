@@ -70,7 +70,7 @@ configurations.virtual = (config) => {
   config.secret = config.secret ||
 //  require('crypto').randomBytes(128).toString('base64')
     'not used yet'  
-  config.store = 'store.db'
+  config.store = config.store || process.cwd() + '/store.db'
   config.type = 'virtual'
   return config
 }
