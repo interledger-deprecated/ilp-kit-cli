@@ -52,6 +52,8 @@ configurations.bells = (config) => {
   config.password = config.password || 'FILL IN: password for account'
   config.account = config.account ||
     'FILL IN: http://example.ledger/accounts/username'
+  config.ledger = config.ledger ||
+    'FILL IN: http://example.ledger'
   config.type = 'bells'
   return config
 }
@@ -72,6 +74,17 @@ configurations.virtual = (config) => {
     'not used yet'  
   config.store = config.store || process.cwd() + '/store.db'
   config.type = 'virtual'
+  return config
+}
+
+configurations.eth = (config) => {
+  // placeholders for now
+  config.asset = config.asset || 'Placeholder'
+  config.id = config.id || 'Placeholder'
+  config.username = config.username || 'Placeholder'
+  config.password = config.password || 'Placeholder'
+  config.account = config.account || 'Placeholder'
+  config.type = 'eth'
   return config
 }
 
