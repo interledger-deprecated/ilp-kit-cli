@@ -1,6 +1,6 @@
 # ilp-connector-cli
 
-> Utility scripts to create a trustline on ILP
+> Utility scripts to configure and start connectors on ILP
 
 ## Installation
 
