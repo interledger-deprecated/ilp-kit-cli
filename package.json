@@ -4,7 +4,7 @@
   "description": "Simple tools start ILP connectors",
   "main": "index.js",
   "dependencies": {
-    "five-bells-connector": "^7.0.3",
+    "five-bells-connector": "^8.0.2",
     "argparse": "^1.0.7"
   },
   "devDependencies": {},
