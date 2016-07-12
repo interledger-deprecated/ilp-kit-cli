@@ -2,7 +2,7 @@
 'use strict'
 
 const fs = require('fs')
-const ArgumentParser = require('argparse').ArgumentParser;
+const ArgumentParser = require('argparse').ArgumentParser
 
 let parser = new ArgumentParser({
   version: '0.0.1',
@@ -22,12 +22,10 @@ parser.addArgument(
 
 parser.addArgument(
   ['-t', '--type'],
-  { help: 'LedgerPlugin type for this config'}
+  { help: 'LedgerPlugin type for this config' }
 )
 
-let args = parser.parseArgs();
-
-let type = args.type
+let args = parser.parseArgs()
 
 if (!args.type || !args.output) {
   parser.printHelp()
@@ -40,7 +38,7 @@ let outputFile = args.output
 
 let input = {}
 if (inputFile) {
-  input = require(process.cwd() + '/' + inputFile) 
+  input = require(process.cwd() + '/' + inputFile)
 }
 
 let configurations = {}
@@ -71,7 +69,7 @@ configurations.virtual = (config) => {
     require('crypto').randomBytes(16).toString('hex')
   config.secret = config.secret ||
 //  require('crypto').randomBytes(128).toString('base64')
-    'not used yet'  
+    'not used yet'
   config.store = config.store || process.cwd() + '/store.db'
   config.type = 'virtual'
   return config

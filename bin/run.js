@@ -2,6 +2,7 @@
 'use strict'
 
 const childProcess = require('child_process')
+const path = require('path')
 
 if (process.argv.length < 4) {
   console.log('usage: run.js <config 1.json> <config 2.json> [more configs.json...]')
@@ -31,11 +32,10 @@ let ledgers = []
 let configs = {}
 
 for (let ledgerFile of process.argv.slice(2)) {
-
   let ledger = require(process.cwd() + '/' + ledgerFile)
 
-  ledgers.push(ledger.asset + "@" + ledger.id)
-  configs[ledger.id] = ledger  
+  ledgers.push(ledger.asset + '@' + ledger.id)
+  configs[ledger.id] = ledger
 
   if (ledger.type === 'virtual' && ledger.token) {
     console.log('Token for ' + ledger.id + ' is: ' + ledger.token)
@@ -46,6 +46,6 @@ defaultSet('CONNECTOR_LEDGERS', JSON.stringify(ledgers))
 defaultSet('CONNECTOR_CREDENTIALS', JSON.stringify(configs))
 defaultSet('CONNECTOR_PAIRS', JSON.stringify(getAllPairs(ledgers)))
 
-const child = childProcess.execFileSync(__dirname + '/../src/run.sh', {
+childProcess.execFileSync(path.join(__dirname, '../src/run.sh'), {
   stdio: [ process.stdout, process.stderr, process.stdin ]
 })
