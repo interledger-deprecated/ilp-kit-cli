@@ -5,7 +5,7 @@
 ## Installation
 
 ```sh
-npm install --save ilp-connector-cli
+npm install -g ilp-connector-cli
 ```
 
 ## Usage
