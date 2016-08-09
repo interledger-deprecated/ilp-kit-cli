@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "ilp-plugin-virtual": "^1.2.3",
-    "five-bells-connector": "^8.0.2",
+    "five-bells-connector": "^9.1.2",
     "argparse": "^1.0.7"
   },
   "devDependencies": {
