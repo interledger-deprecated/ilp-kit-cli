@@ -51,14 +51,14 @@ configurations.bells = (config) => {
   config.account = config.account ||
     'FILL IN: http://example.ledger/accounts/username'
   config.ledger = config.ledger ||
-    'FILL IN: http://example.ledger'
+    'FILL IN: ledger.example.'
   config.type = 'bells'
   return config
 }
 
 configurations.virtual = (config) => {
   config.asset = config.asset || 'USD'
-  config.id = config.id || 'http://virtual-ledger.example'
+  config.id = config.id || 'example.virtual'
   config.username = config.username || 'doesnt matter'
   config.password = config.password || 'doesnt matter'
   config.account = config.host || 'nerd'
