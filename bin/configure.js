@@ -72,6 +72,12 @@ configurations.virtual = (config) => {
 //  require('crypto').randomBytes(128).toString('base64')
     'not used yet'
   config.store = config.store || process.cwd() + '/store.db'
+  config.info = config.info || {
+    currencyCode: 'USD',
+    currencySymbol: '$',
+    precision: 15,
+    scale: 15
+  }
   config.type = 'virtual'
   return config
 }
