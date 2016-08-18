@@ -65,6 +65,7 @@ configurations.virtual = (config) => {
   config.account = config.host || 'nerd'
   config.host = config.host || 'ws://broker.hivemq.com:8000'
   config.limit = config.limit || '0'
+  config.max = config.max || '1000'
   config.balance = config.balance || 'FILL IN: balance (number)'
   config.token = config.token ||
     require('crypto').randomBytes(16).toString('hex')
