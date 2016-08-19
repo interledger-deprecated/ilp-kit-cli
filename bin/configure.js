@@ -64,12 +64,12 @@ configurations.virtual = (config) => {
   config.password = config.password || 'doesnt matter'
   config.account = config.host || 'nerd'
   config.host = config.host || 'ws://broker.hivemq.com:8000'
-  config.limit = config.limit || '0'
-  config.warnLimit = config.warnLimit || '0'
-  config.max = config.max || '1000'
-  config.warnMax = config.warnMax || '900'
+  config.initialBalance = config.initialBalance || 'FILL IN: balance (number)'
+  config.minBalance = config.minBalance || '0'
+  config.maxBalance = config.max || '1000'
+  config.settleIfUnder = config.settleIfUnder || '0'
+  config.settleIfOver = config.settleIfOver || '1000'
   config.settlePercent = config.settlePercent || '0.5'
-  config.balance = config.balance || 'FILL IN: balance (number)'
   config.token = config.token ||
     require('crypto').randomBytes(16).toString('hex')
   config.secret = config.secret ||
