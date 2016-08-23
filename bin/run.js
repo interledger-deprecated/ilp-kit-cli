@@ -25,6 +25,7 @@ const getAllPairs = (ledgers) => {
   return pairs
 }
 
+defaultSet('CONNECTOR_HOSTNAME', 'localhost')
 defaultSet('CONNECTOR_PORT', 4000)
 defaultSet('CONNECTOR_BACKEND', 'one-to-one')
 
