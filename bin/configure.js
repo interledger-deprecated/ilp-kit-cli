@@ -60,8 +60,6 @@ configurations.virtual = (config) => {
   config.asset = config.asset || 'USD'
   config.id = config.id || 'example.virtual.'
   config.prefix = config.prefix || 'example.virtual.'
-  config.username = config.username || 'doesnt matter'
-  config.password = config.password || 'doesnt matter'
   config.account = config.host || 'nerd'
   config.host = config.host || 'ws://broker.hivemq.com:8000'
   config.initialBalance = config.initialBalance || 'FILL IN: balance (number)'
