@@ -4,8 +4,9 @@
   "description": "Simple tools start ILP connectors",
   "main": "index.js",
   "dependencies": {
-    "five-bells-connector": "^9.2.1",
-    "argparse": "^1.0.7"
+    "argparse": "^1.0.7",
+    "base64url": "^2.0.0",
+    "five-bells-connector": "^9.2.1"
   },
   "devDependencies": {
     "eslint": "^3.0.1",

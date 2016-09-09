@@ -3,6 +3,7 @@
 
 const childProcess = require('child_process')
 const path = require('path')
+const base64url = require('base64url')
 
 if (process.argv.length < 4) {
   console.log('usage: run.js <config 1.json> <config 2.json> [more configs.json...]')
@@ -39,7 +40,12 @@ for (let ledgerFile of process.argv.slice(2)) {
   configs[ledger.id] = ledger
 
   if (ledger.type === 'virtual' && ledger.token) {
-    console.log('Token for ' + ledger.id + ' is: ' + ledger.token)
+    let token = ledger.token
+    if (typeof ledger.token === 'object') {
+      token = base64url(JSON.stringify(ledger.token))
+    }
+
+    console.log('Token for ' + ledger.id + ' is: ' + token)
   }
 }
 

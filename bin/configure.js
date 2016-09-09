@@ -61,15 +61,16 @@ configurations.virtual = (config) => {
   config.id = config.id || 'example.virtual.'
   config.prefix = config.prefix || 'example.virtual.'
   config.account = config.host || 'nerd'
-  config.host = config.host || 'ws://broker.hivemq.com:8000'
   config.initialBalance = config.initialBalance || 'FILL IN: balance (number)'
   config.minBalance = config.minBalance || '0'
   config.maxBalance = config.max || '1000'
   config.settleIfUnder = config.settleIfUnder || '0'
   config.settleIfOver = config.settleIfOver || '1000'
   config.settlePercent = config.settlePercent || '0.5'
-  config.token = config.token ||
-    require('crypto').randomBytes(16).toString('hex')
+  config.token = config.token || {
+    channel: require('crypto').randomBytes(16).toString('hex'),
+    host: 'ws://broker.hivemq.com:8000'
+  }
   config.secret = config.secret ||
 //  require('crypto').randomBytes(128).toString('base64')
     'not used yet'
