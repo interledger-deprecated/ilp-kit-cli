@@ -6,7 +6,8 @@
   "dependencies": {
     "argparse": "^1.0.7",
     "base64url": "^2.0.0",
-    "five-bells-connector": "^9.2.1"
+    "ilp-connector": "interledger/js-ilp-connector",
+    "ilp-plugin-ripple": "^2.1.0"
   },
   "devDependencies": {
     "eslint": "^3.0.1",

@@ -53,7 +53,7 @@ defaultSet('CONNECTOR_LEDGERS', JSON.stringify(ledgers))
 defaultSet('CONNECTOR_CREDENTIALS', JSON.stringify(configs))
 defaultSet('CONNECTOR_PAIRS', JSON.stringify(getAllPairs(ledgers)))
 
-defaultSet('DEBUG', 'connection,connection:err,ilp-plugin-virtual,ilp-plugin-virtual:err')
+defaultSet('DEBUG', 'connection,connection:err,ilp-plugin-*,rpc')
 
 childProcess.execFileSync(path.join(__dirname, '../src/run.sh'), {
   stdio: [ process.stdout, process.stderr, process.stdin ]
