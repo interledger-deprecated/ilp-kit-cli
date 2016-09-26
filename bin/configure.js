@@ -190,7 +190,7 @@ const processAnswers = {
   bells: (answers) => {
     return {
       type: 'bells',
-      asset: answers.asset,
+      asset: answers.currencyCode,
       id: answers.ledger,
       username: answers.username,
       password: answers.password,

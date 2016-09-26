@@ -56,3 +56,14 @@ your url is: http://senedqjwk.localtunnel.me
 $ CONNECTOR_PUBLIC_URI=https://senedqjwk.localtunnel.me CONNECTOR_PORT=4444 ilp-connector-run five-bells.json trustline.json
 # ...
 ```
+
+## Usage with Docker
+
+Because `ilp-connector-run` launches `ilp-connector` from the npm module, it is not able to start through
+docker. If you want to use docker, however, it's still easy. Just run:
+
+```sh
+$ ilp-connector-run --env five-bells.json trustline.json > args.list
+$ vim args.list # you can modify the environment variables as you see fit
+$ docker run -it --rm --env-file ./args.list interledger/js-ilp-connector
+```

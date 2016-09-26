@@ -10,6 +10,7 @@ const commander = require('commander')
 commander
   .version('2.0.0')
   .arguments('<plugins...>')
+  .option('-e, --env', 'expand to environment variables instead of running')
   .parse(process.argv)
 
 const plugins = commander.args
@@ -19,8 +20,11 @@ if (plugins.length < 2) {
   process.exit(1)
 }
 
+// store the environment variables that we've set
+let env = ''
 const defaultSet = (field, value) => {
   process.env[field] = process.env[field] || value
+  env += field + '=' + value + '\n'
 }
 
 const getAllPairs = (ledgers) => {
@@ -53,7 +57,7 @@ for (let ledgerFile of plugins) {
   ledgers.push(ledger.asset + '@' + ledger.id)
   configs[ledger.id] = ledger
 
-  if (ledger.type === 'virtual' && ledger.token) {
+  if (ledger.type === 'virtual' && ledger.token && !commander.env) {
     let token = ledger.token
     if (typeof ledger.token === 'object') {
       token = base64url(JSON.stringify(ledger.token))
@@ -69,6 +73,10 @@ defaultSet('CONNECTOR_PAIRS', JSON.stringify(getAllPairs(ledgers)))
 
 defaultSet('DEBUG', 'connection,ilp-*,rpc')
 
-childProcess.execFileSync(path.join(__dirname, '../src/run.sh'), {
-  stdio: [ process.stdout, process.stderr, process.stdin ]
-})
+if (commander.env) {
+  process.stdout.write(env)
+} else {
+  childProcess.execFileSync(path.join(__dirname, '../src/run.sh'), {
+    stdio: [ process.stdout, process.stderr, process.stdin ]
+  })
+}
