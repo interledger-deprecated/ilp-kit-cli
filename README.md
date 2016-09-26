@@ -1,4 +1,7 @@
-# ilp-connector-cli
+# ilp-connector-cli [![npm][npm-image]][npm-url]
+
+[npm-image]: https://img.shields.io/npm/v/ilp-connector-cli.svg?style=flat
+[npm-url]: https://npmjs.org/package/ilp-connector-cli
 
 > Utility scripts to configure and start connectors on ILP
 
