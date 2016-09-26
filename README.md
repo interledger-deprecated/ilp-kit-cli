@@ -22,13 +22,10 @@ five-bells.json`.  To create a config for a trustline, run
 `ilp-connector-config -t virtual -o trustline.json`.  You can use
 `ilp-connector-config -h` to see more options.
 
-Some optional settings for `ilp-plugin-virtual` will not be included in the
-generated JSON files. To read about all options in `ilp-plugin-virtual`, read
-[its README](https://github.com/interledger/js-ilp-plugin-virtual).
-
-Now go into the two files that were created: `five-bells.json` and
-`trustline.json`.  They have partially completed configurations for creating
-their plugins. Fill in the necessary fields in a text editor.
+The `ilp-connector-config` tool will walk you through the different configuration
+options, with defaults provided for each of them. From this input, it will assemble
+a JSON file with the proper fields set. You can then change this file as you see
+fit, although all necessary configuration has been performed.
 
 ### Running
 
@@ -37,9 +34,25 @@ Run `ilp-connector-run five-bells.json trustline.json` to start the connector.
 The JSON files will be passed into the `CONNECTOR_CREDENTIALS` field in the
 connector.
 
+#### Further connection configuration
+
 If you want to set any of the connector's environment variables (as specified
 in [the connector's
 README](https://github.com/interledger/five-bells-connector#configuration),
-you can prefix the command with them. For example:
+you can prefix the command with them.
 
-`CONNECTOR_BACKEND=fixerio ilp-connector-run five-bells.json trustline.json`
+To run a connector which is compatible with the `five-bells-wallet`, run
+`CONNECTOR_MAX_HOLD_TIME=100 ilp-connector-run five-bells.json trustline.json`.
+
+#### Giving access to others
+
+To run a connector which can be connected to from different machines, you will
+need to forward your ports. You can use [localtunnel](https://localtunnel.github.io/www/).
+Just run:
+
+```sh
+$ lt --port 4444
+your url is: http://senedqjwk.localtunnel.me
+$ CONNECTOR_PUBLIC_URI=https://senedqjwk.localtunnel.me CONNECTOR_PORT=4444 ilp-connector-run five-bells.json trustline.json
+# ...
+```
