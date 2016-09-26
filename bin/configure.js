@@ -202,8 +202,8 @@ const processAnswers = {
 
 commander
   .version('2.0.0')
-  .option('-t, --type <type>')
-  .option('-o, --output <output>')
+  .option('-t, --type <type>', 'type of ledger plugin (as in ilp-plugin-<type>)')
+  .option('-o, --output <output>', 'file to output to (eg. example.json)')
   .parse(process.argv)
 
 const type = commander.type
