@@ -209,7 +209,6 @@ commander
 const type = commander.type
 if (typeof type !== 'string' || Object.keys(questions).indexOf(type) < 0) {
   commander.outputHelp()
-  console.log()
   console.error('Invalid plugin type. Enter either "-t virtual" or "-t bells"')
   process.exit(1)
 }
@@ -217,7 +216,6 @@ if (typeof type !== 'string' || Object.keys(questions).indexOf(type) < 0) {
 const output = commander.output
 if (typeof output !== 'string') {
   commander.outputHelp()
-  console.log()
   console.error('Missing output file. Specify a json file to output to with "-o" or "--output"')
   process.exit(1)
 } else if (fs.existsSync(output)) {

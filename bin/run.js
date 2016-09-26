@@ -1,12 +1,21 @@
 #!/usr/bin/env node
 'use strict'
 
+const fs = require('fs')
 const childProcess = require('child_process')
 const path = require('path')
 const base64url = require('base64url')
+const commander = require('commander')
 
-if (process.argv.length < 4) {
-  console.log('usage: run.js <config 1.json> <config 2.json> [more configs.json...]')
+commander
+  .version('2.0.0')
+  .arguments('<plugins...>')
+  .parse(process.argv)
+
+const plugins = commander.args
+if (plugins.length < 2) {
+  commander.outputHelp()
+  console.error('Must enter at least two plugin configs.')
   process.exit(1)
 }
 
@@ -33,7 +42,12 @@ defaultSet('CONNECTOR_BACKEND', 'one-to-one')
 let ledgers = []
 let configs = {}
 
-for (let ledgerFile of process.argv.slice(2)) {
+for (let ledgerFile of plugins) {
+  if (!fs.existsSync(ledgerFile)) {
+    console.error('File "' + ledgerFile + '" does not exist.')
+    process.exit(1)
+  }
+
   let ledger = require(process.cwd() + '/' + ledgerFile)
 
   ledgers.push(ledger.asset + '@' + ledger.id)
