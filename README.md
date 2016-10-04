@@ -15,55 +15,56 @@ npm install -g ilp-connector-cli
 
 ### Configuring
 
-To create a trustline, you must first create configs for the ledgers that you
-wish to use. The `ilp-connector-config` tool is made for this purpose. To use a
-five-bells-ledger account, run: `ilp-connector-config -t bells -o
-five-bells.json`.  To create a config for a trustline, run
-`ilp-connector-config -t virtual -o trustline.json`.  You can use
-`ilp-connector-config -h` to see more options.
+In order to configure a connector, all you have to do is run
+`ilp-connector-config -o connector.list`. This will create an environment file
+called `connector.list`, which can be used by Docker (see '**Running**').  A
+command-line interface will walk you through the required steps.
 
-The `ilp-connector-config` tool will walk you through the different configuration
-options, with defaults provided for each of them. From this input, it will assemble
-a JSON file with the proper fields set. You can then change this file as you see
-fit, although all necessary configuration has been performed.
+First, the CLI will ask for some general options. These options will be
+assigned to the environment variables specified in [ILP-connector's
+README](https://github.com/interledger/js-ilp-connector). You can see and change
+these settings by reading `connector.list` after `ilp-connnector-config` is
+done.
+
+Next, the CLI will prompt you for the number of plugins your connector will
+use. Plugin-specific questions will be asked in order to create appropriate
+configurations for each plugin. Note that if your `id`s are not unique, then
+you may overwrite other plugins. You can edit the final output in the
+`CONNECTOR_LEDGERS` field of `connector.list`. It is output in the form of a
+stringified JSON object.
 
 ### Running
 
-Once you have filled in the config files, you can launch your nerd connector.
-Run `ilp-connector-run five-bells.json trustline.json` to start the connector.
-The JSON files will be passed into the `CONNECTOR_CREDENTIALS` field in the
-connector.
+The environment file output by `ilp-connector-config` can be used by docker
+in order to start a connector. Just run:
 
-#### Further connection configuration
-
-If you want to set any of the connector's environment variables (as specified
-in [the connector's
-README](https://github.com/interledger/five-bells-connector#configuration),
-you can prefix the command with them.
-
-To run a connector which is compatible with the `five-bells-wallet`, run
-`CONNECTOR_MAX_HOLD_TIME=100 ilp-connector-run five-bells.json trustline.json`.
+```sh
+$ docker run -it --rm --env-file ./connector.list interledger/js-ilp-connector
+```
 
 #### Giving access to others
 
 To run a connector which can be connected to from different machines, you will
-need to forward your ports. You can use [localtunnel](https://localtunnel.github.io/www/).
+need to forward your ports. You can use [localtunnel](https://localtunnel.github.io/www/)
+to temporarily do this without requiring remote hosting or network configuration.
 Just run:
 
 ```sh
 $ lt --port 4444
 your url is: http://senedqjwk.localtunnel.me
-$ CONNECTOR_PUBLIC_URI=https://senedqjwk.localtunnel.me CONNECTOR_PORT=4444 ilp-connector-run five-bells.json trustline.json
-# ...
 ```
 
-## Usage with Docker
-
-Because `ilp-connector-run` launches `ilp-connector` from the npm module, it is not able to start through
-docker. If you want to use docker, however, it's still easy. Just run:
+If you are configuring a new connector, then enter that URL when it prompts for
+your public URI. Otherwise, go into your existing environment file and change
+the line:
 
 ```sh
-$ ilp-connector-run --env five-bells.json trustline.json > args.list
-$ vim args.list # you can modify the environment variables as you see fit
-$ docker run -it --rm --env-file ./args.list interledger/js-ilp-connector
+CONNECTOR_PUBLIC_URI= #.....
+```
+
+to:
+
+```sh
+# write the URL that you got from the previous step instead of this URL
+CONNECTOR_PUBLIC_URI=http://senedqjwk.localtunnel.me
 ```
