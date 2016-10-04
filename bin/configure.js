@@ -5,6 +5,8 @@ const path = require('path')
 const fs = require('fs')
 const commander = require('commander')
 const inquirer = require('inquirer')
+const co = require('co')
+const chalk = require('chalk')
 
 const crypto = require('crypto')
 const keypairs = require('ripple-keypairs')
@@ -14,9 +16,21 @@ const validateNegativeNumber = (s) => !!s.match(/^\-?[0-9]+$/)
 const validatePrefix = (s) => !!s.match(/^[a-zA-Z0-9._~-]+\.$/)
 const validateAccount = (s) => !!s.match(/^[a-zA-Z0-9_~-]+$/)
 const validateRippleSecret = (s) => !!s.match(/^s[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz]+$/)
+const validatePeers = () => true
+const validateUri = () => true
 
-const questions = {
-  'virtual': [
+// Text formatting functions
+const printHeader = (s) => {
+  console.log()
+  console.log(chalk.yellow(s))
+  //console.log(chalk.gray('-'.repeat(s.length)))
+}
+const printInfo = (s) => {
+  console.info(chalk.gray(s))
+}
+
+const pluginQuestions = {
+  'ilp-plugin-virtual': [
     // the plugin asset
     { type: 'input',
       name: 'currencyCode',
@@ -112,7 +126,7 @@ const questions = {
       when: (a) => a.settleRipple }
   ],
 
-  'bells': [
+  'ilp-plugin-bells': [
     // the plugin asset
     { type: 'input',
       name: 'currencyCode',
@@ -148,36 +162,38 @@ const questions = {
 }
 
 const processAnswers = {
-  virtual: (answers) => {
+  'ilp-plugin-virtual': (answers) => {
     let result = {
-      type: 'virtual',
-      asset: answers.currencyCode,
-      id: answers.prefix,
-      prefix: answers.prefix,
-      account: answers.account,
-      initialBalance: answers.initialBalance,
-      minBalance: answers.minBalance,
-      maxBalance: answers.maxBalance,
-      settleIfUnder: answers.settleIfUnder || '1',
-      settleIfOver: answers.settleIfOver || '9',
-      settlePercent: answers.settlePercent || '0.5',
-      secret: crypto.randomBytes(16).toString('hex'),
-      store: answers.store,
-      info: {
-        currencyCode: answers.currencyCode,
-        currencySymbol: answers.currencySymbol,
-        scale: answers.scale,
-        precision: answers.precision
-      },
-      token: {
-        channel: crypto.randomBytes(16).toString('hex'),
-        host: answers.host
+      key: answers.prefix,
+      plugin: 'ilp-plugin-virtual',
+      currency: answers.currencyCode,
+      options: {
+        prefix: answers.prefix,
+        account: answers.account,
+        initialBalance: answers.initialBalance,
+        minBalance: answers.minBalance,
+        maxBalance: answers.maxBalance,
+        settleIfUnder: answers.settleIfUnder || '1',
+        settleIfOver: answers.settleIfOver || '9',
+        settlePercent: answers.settlePercent || '0.5',
+        secret: crypto.randomBytes(16).toString('hex'),
+        store: answers.store,
+        info: {
+          currencyCode: answers.currencyCode,
+          currencySymbol: answers.currencySymbol,
+          scale: answers.scale,
+          precision: answers.precision
+        },
+        token: {
+          channel: crypto.randomBytes(16).toString('hex'),
+          host: answers.host
+        }
       }
     }
 
     if (answers.settleRipple) {
-      result._optimisticPlugin = 'ilp-plugin-ripple'
-      result._optimisticPluginOpts = {
+      result.options._optimisticPlugin = 'ilp-plugin-ripple'
+      result.options._optimisticPluginOpts = {
         type: 'ripple',
         address: keypairs.deriveAddress(keypairs.deriveKeypair(secret).publicKey),
         secret: answers.settleSecret,
@@ -187,47 +203,137 @@ const processAnswers = {
 
     return result
   },
-  bells: (answers) => {
+  'ilp-plugin-bells': (answers) => {
     return {
-      type: 'bells',
-      asset: answers.currencyCode,
-      id: answers.ledger,
-      username: answers.username,
-      password: answers.password,
-      account: answers.account,
-      ledger: answers.ledger
+      key: answers.ledger,
+      plugin: 'bells',
+      currency: answers.currencyCode,
+      options: {
+        username: answers.username,
+        password: answers.password,
+        account: answers.account,
+        ledger: answers.ledger
+      }
     }
   }
 }
 
 commander
   .version('2.0.0')
-  .option('-t, --type <type>', 'type of ledger plugin (as in ilp-plugin-<type>)')
-  .option('-o, --output <output>', 'file to output to (eg. example.json)')
+  .option('-o, --output <output>', 'file to output to (eg. example.list)')
   .parse(process.argv)
-
-const type = commander.type
-if (typeof type !== 'string' || Object.keys(questions).indexOf(type) < 0) {
-  commander.outputHelp()
-  console.error('Invalid plugin type. Enter either "-t virtual" or "-t bells"')
-  process.exit(1)
-}
 
 const output = commander.output
 if (typeof output !== 'string') {
   commander.outputHelp()
-  console.error('Missing output file. Specify a json file to output to with "-o" or "--output"')
+  console.error('Missing output file. Specify an env file to output to with "-o" or "--output"')
   process.exit(1)
 } else if (fs.existsSync(output)) {
-  console.error('Will overwrite "' + output + '". Cancel now if you aren\'t ok with that.') 
+  printInfo('Will overwrite "' + output + '". Cancel now if you aren\'t ok with that.') 
 }
 
-console.log()
-inquirer.prompt(questions[type]).then((answers) => {
-  const result = processAnswers[type](answers)
-  console.log('\nWriting data to "' + output + '"...')
-  fs.writeFileSync(output, JSON.stringify(result, null, 2) + '\n')
-  console.log('Done!')
+// start asking the questions
+co(function * () {
+  // common information between plugins
+  printHeader('General Connector Configuration')
+  const preliminary = yield inquirer.prompt([
+    // CONNECTOR_PORT
+    { type: 'input',
+      name: 'port',
+      message: 'What port will your connector run on?',
+      validate: validateNumber,
+      default: '4000' },
+
+    // CONNECTOR_PEERS
+    { type: 'input',
+      name: 'peers',
+      message: 'Give the HTTP addresses of any connectors you wish to peer with (comma-separated list)',
+      validate: validatePeers,
+      filter: (s) => (s.replace(/\s*,\s*/g, ',')),
+      default: '' },
+
+    // CONNECTOR_PUBLIC_URI
+    { type: 'input',
+      name: 'uri',
+      message: 'What public URI can your connector be accessed at?',
+      validate: validateUri,
+      default: (ans) => ('http://localhost:' + ans.port) },
+
+    // CONNECTOR_MAX_HOLD_TIME
+    { type: 'input',
+      name: 'hold',
+      message: 'What is the maximum time you will put funds on hold (in seconds)?',
+      validate: validateNumber,
+      default: '100' },
+
+    // CONNECTOR_LOG_LEVEL
+    { type: 'list',
+      name: 'verbosity',
+      message: 'What level of verbosity would you like?',
+      choices: ['info', 'debug', 'trace', 'fatal', 'error', 'warn'] },
+
+    // number of plugins
+    { type: 'input',
+      name: 'number',
+      message: 'How many ledger connections (plugins) will your connector have?',
+      validate: validateNumber,
+      default: '2' }
+  ])
+
+  const numPlugins = preliminary.number
+  const ledgers = {}
+
+  // create each of the plugins
+  for (let i = 0; i < numPlugins; ++i) {
+    printHeader('Plugin ' + (i + 1) + ' Configuration')
+    const pluginType = yield inquirer.prompt([
+      { type: 'list',
+        message: 'What type is plugin ' + (i + 1) + '?',
+        name: 'type',
+        choices: Object.keys(pluginQuestions).sort() }
+    ])
+    const answers = yield inquirer.prompt(pluginQuestions[pluginType.type])
+    const ledger = processAnswers[pluginType.type](answers)
+    ledgers[ledger.key] = {
+      plugin: ledger.plugin,
+      currency: ledger.currency,
+      options: ledger.options
+    }
+  }
+
+  // confirm before writing file
+  printHeader('Output')
+  const confirmation = yield inquirer.prompt([
+    { type: 'confirm',
+      name: 'confirmed',
+      message: 'Write these options to "' + output + '"?',
+      default: 'true' }
+  ])
+  if (!confirmation.confirmed) {
+    console.log()
+    console.error('aborted by user.')
+    process.exit(1)
+  }
+
+  // assign all the environment variables
+  const env = {}
+  env.CONNECTOR_LEDGERS = ledgers
+  env.CONNECTOR_PORT = preliminary.port
+  env.CONNECTOR_PEERS = preliminary.peers
+  env.CONNECTOR_PUBLIC_URI = preliminary.uri
+  env.CONNECTOR_MAX_HOLD_TIME = preliminary.hold
+  env.CONNECTOR_LOG_LEVEL = preliminary.verbosity
+
+  // write the environment to a docker-compatible env-file
+  printInfo('Writing enviroment to "' + output + '"...')
+  fs.writeFileSync(
+    output,
+    Object.keys(env).reduce((out, key) => (
+      (env[key])? (out + key + '=' + JSON.stringify(env[key]) + '\n'):(out)
+    ), '')
+  )
+  printInfo('Done.')
+
 }).catch((e) => {
   console.error(e)
   process.exit(1)
