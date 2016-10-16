@@ -22,7 +22,7 @@ command-line interface will walk you through the required steps.
 
 First, the CLI will ask for some general options. These options will be
 assigned to the environment variables specified in [ILP-connector's
-README](https://github.com/interledger/js-ilp-connector). You can see and change
+README](https://github.com/interledgerjs/ilp-connector). You can see and change
 these settings by reading `connector.list` after `ilp-connnector-config` is
 done.
 
@@ -39,7 +39,7 @@ The environment file output by `ilp-connector-config` can be used by docker
 in order to start a connector. Just run:
 
 ```sh
-$ docker run -it --rm --env-file ./connector.list interledger/js-ilp-connector
+$ docker run -it --rm --env-file ./connector.list interledgerjs/ilp-connector
 ```
 
 #### Giving access to others
