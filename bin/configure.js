@@ -7,6 +7,7 @@ const commander = require('commander')
 const inquirer = require('inquirer')
 const co = require('co')
 const chalk = require('chalk')
+const PluginBells = require('ilp-plugin-bells')
 
 const crypto = require('crypto')
 const keypairs = require('ripple-keypairs')
@@ -30,7 +31,7 @@ const printInfo = (s) => {
 }
 
 const pluginQuestions = {
-  'ilp-plugin-virtual': [
+  'ilp-plugin-virtual': () => inquirer.prompt([
     // the plugin asset
     { type: 'input',
       name: 'currencyCode',
@@ -124,9 +125,10 @@ const pluginQuestions = {
       default: keypairs.generateSeed(),
       validate: validateRippleSecret,
       when: (a) => a.settleRipple }
-  ],
+  ]),
 
-  'ilp-plugin-bells': [
+  'ilp-plugin-bells': () => inquirer.prompt([
+    /*
     // the plugin asset
     { type: 'input',
       name: 'currencyCode',
@@ -146,23 +148,23 @@ const pluginQuestions = {
       message: 'What is your username on this Five Bells Ledger?',
       default: 'test',
       validate: validateAccount },
+    */
+    // the plugin account URI
+    { type: 'input',
+      name: 'account',
+      message: 'What is the URI for your account on this ledger?',
+      default: 'https://red.ilpdemo.org/ledger/accounts/test' },
 
     // the plugin password
     { type: 'input',
       name: 'password',
       message: 'What is your password?',
       default: 'test' },
-
-    // the plugin account URI
-    { type: 'input',
-      name: 'account',
-      message: 'What is the URI for your account on this ledger?',
-      default: 'https://red.ilpdemo.org/ledger/accounts/test' },
-  ]
+  ])
 }
 
 const processAnswers = {
-  'ilp-plugin-virtual': (answers) => {
+  'ilp-plugin-virtual': function * (answers) {
     let result = {
       key: answers.prefix,
       plugin: 'ilp-plugin-virtual',
@@ -195,7 +197,7 @@ const processAnswers = {
       result.options._optimisticPlugin = 'ilp-plugin-ripple'
       result.options._optimisticPluginOpts = {
         type: 'ripple',
-        address: keypairs.deriveAddress(keypairs.deriveKeypair(secret).publicKey),
+        address: keypairs.deriveAddress(keypairs.deriveKeypair(answers.settleSecret).publicKey),
         secret: answers.settleSecret,
         server: answers.settleServer
       }
@@ -203,10 +205,35 @@ const processAnswers = {
 
     return result
   },
-  'ilp-plugin-bells': (answers) => {
+
+  'ilp-plugin-bells': function * (answers) {
+    const username = (/^.*\/(.+)$/).exec(answers.account)[1]
+    const plugin = new PluginBells({
+      username: username,
+      password: answers.password,
+      account: answers.account
+    })
+
+    yield plugin.connect()
+    const info = yield plugin.getInfo()
+    const ledger = yield plugin.getPrefix()
+    yield plugin.disconnect()
+
+    return {
+      key: ledger,
+      plugin: 'ilp-plugin-bells',
+      currency: info.currencyCode,
+      options: {
+        username: username,
+        password: answers.password,
+        account: answers.account,
+        ledger: ledger
+      }
+    }
+    /*
     return {
       key: answers.ledger,
-      plugin: 'bells',
+      plugin: 'ilp-plugin-bells',
       currency: answers.currencyCode,
       options: {
         username: answers.username,
@@ -215,6 +242,7 @@ const processAnswers = {
         ledger: answers.ledger
       }
     }
+    */
   }
 }
 
@@ -270,7 +298,8 @@ co(function * () {
     { type: 'list',
       name: 'verbosity',
       message: 'What level of verbosity would you like?',
-      choices: ['info', 'debug', 'trace', 'fatal', 'error', 'warn'] },
+      default: 'info',
+      choices: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] },
 
     // number of plugins
     { type: 'input',
@@ -292,8 +321,8 @@ co(function * () {
         name: 'type',
         choices: Object.keys(pluginQuestions).sort() }
     ])
-    const answers = yield inquirer.prompt(pluginQuestions[pluginType.type])
-    const ledger = processAnswers[pluginType.type](answers)
+    const answers = yield pluginQuestions[pluginType.type]()
+    const ledger = yield processAnswers[pluginType.type](answers)
     ledgers[ledger.key] = {
       plugin: ledger.plugin,
       currency: ledger.currency,
@@ -317,19 +346,20 @@ co(function * () {
 
   // assign all the environment variables
   const env = {}
-  env.CONNECTOR_LEDGERS = ledgers
+  env.CONNECTOR_LEDGERS = JSON.stringify(ledgers)
   env.CONNECTOR_PORT = preliminary.port
   env.CONNECTOR_PEERS = preliminary.peers
   env.CONNECTOR_PUBLIC_URI = preliminary.uri
   env.CONNECTOR_MAX_HOLD_TIME = preliminary.hold
   env.CONNECTOR_LOG_LEVEL = preliminary.verbosity
+  env.DEBUG='ilp*,connection,rpc'
 
   // write the environment to a docker-compatible env-file
   printInfo('Writing enviroment to "' + output + '"...')
   fs.writeFileSync(
     output,
     Object.keys(env).reduce((out, key) => (
-      (env[key])? (out + key + '=' + JSON.stringify(env[key]) + '\n'):(out)
+      (env[key])? (out + key + '=' + env[key] + '\n'):(out)
     ), '')
   )
   printInfo('Done.')
