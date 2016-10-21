@@ -1,6 +1,6 @@
 {
   "name": "ilp-connector-cli",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Simple tools start ILP connectors",
   "main": "index.js",
   "dependencies": {
