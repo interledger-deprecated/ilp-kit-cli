@@ -1,5 +1,4 @@
 const inquirer = require('inquirer')
-const chalk = require('chalk')
 const valid = require('./validate')
 
 const pluginQuestions = [

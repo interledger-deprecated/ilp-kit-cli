@@ -95,11 +95,13 @@ co(function * () {
   env.CLIENT_PORT = '3010'
   env.CLIENT_PUBLIC_PORT = '443'
   env.DEBUG = 'ilp*,connection,rpc'
+  env.LEDGER_CURRENCY_CODE = wallet.ledger_currency_code
+  env.LEDGER_CURRENCY_SYMBOL = wallet.ledger_currency_symbol
   env.LEDGER_ILP_PREFIX = wallet.ledger_ilp_prefix
   env.LEDGER_RECOMMENDED_CONNECTORS = ''
 
   if (wallet.connector) {
-    env.CONNECTOR_ENABLE = wallet.connector? 'true':null
+    env.CONNECTOR_ENABLE = wallet.connector ? 'true' : null
     env.CONNECTOR_LEDGERS = '\'' + JSON.stringify(ledgers) + '\''
     env.CONNECTOR_LOG_LEVEL = connector.verbosity
     env.CONNECTOR_MAX_HOLD_TIME = connector.hold

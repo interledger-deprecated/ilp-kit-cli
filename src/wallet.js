@@ -41,6 +41,19 @@ const askWalletQuestions = function * () {
       message: 'What secret key will your ilp-kit use?',
       default: crypto.randomBytes(33).toString('base64') },
 
+    // LEDGER_CURRENCY_CODE
+    { type: 'input',
+      name: 'ledger_currency_code',
+      message: 'What is your ledger\'s currency code?',
+      validate: valid.validateCurrency,
+      default: 'USD' },
+
+    // LEDGER_CURRENCY_SYMBOL
+    { type: 'input',
+      name: 'ledger_currency_symbol',
+      message: 'What is your ledger\'s currency symbol?',
+      default: '$' },
+
     // LEDGER_ILP_PREFIX
     { type: 'input',
       name: 'ledger_ilp_prefix',
