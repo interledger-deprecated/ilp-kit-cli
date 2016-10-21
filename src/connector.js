@@ -3,13 +3,6 @@ const valid = require('./validate')
 
 const askConnectorQuestions = function * () {
   return yield inquirer.prompt([
-    // CONNECTOR_PORT
-    { type: 'input',
-      name: 'port',
-      message: 'What port will your connector run on?',
-      validate: valid.validateNumber,
-      default: '4000' },
-
     // CONNECTOR_PEERS
     { type: 'input',
       name: 'peers',
@@ -17,13 +10,6 @@ const askConnectorQuestions = function * () {
       validate: valid.validatePeers,
       filter: (s) => (s.replace(/\s*,\s*/g, ',')),
       default: '' },
-
-    // CONNECTOR_PUBLIC_URI
-    { type: 'input',
-      name: 'uri',
-      message: 'What public URI can your connector be accessed at?',
-      validate: valid.validateUri,
-      default: (ans) => ('http://localhost:' + ans.port) },
 
     // CONNECTOR_MAX_HOLD_TIME
     { type: 'input',

@@ -1,6 +1,6 @@
 const inquirer = require('inquirer')
 const chalk = require('chalk')
-const PluginBells = require('ilp-plugin-bells')
+const valid = require('./validate')
 
 const pluginQuestions = [
   // the plugin account URI
@@ -13,40 +13,34 @@ const pluginQuestions = [
   { type: 'input',
     name: 'password',
     message: 'What is your password?',
-    default: 'testtest' }
+    default: 'testtest' },
+
+  { type: 'input',
+    name: 'ledger',
+    message: 'What is the ledger\'s ILP address?',
+    validate: valid.validatePrefix,
+    default: 'ilpdemo.red.' },
+
+  { type: 'input',
+    name: 'currency',
+    message: 'What is the ledger\'s currency code?',
+    validate: valid.validateCurrency,
+    default: 'USD' }
 ]
 
 const askPluginQuestions = function * () {
-  let answers
-
-  try {
-    answers = yield inquirer.prompt(pluginQuestions)
-  } catch (e) {
-    console.error(chalk.red('Invalid account URI or password:' + e.message))
-    return (yield askPluginQuestions())
-  }
-
+  const answers = yield inquirer.prompt(pluginQuestions)
   const username = (/^.*\/(.+)$/).exec(answers.account)[1]
-  const plugin = new PluginBells({
-    username: username,
-    password: answers.password,
-    account: answers.account
-  })
-
-  yield plugin.connect()
-  const info = yield plugin.getInfo()
-  const ledger = yield plugin.getPrefix()
-  yield plugin.disconnect()
 
   return {
-    key: ledger,
+    key: answers.ledger,
     plugin: 'ilp-plugin-bells',
-    currency: info.currencyCode,
+    currency: answers.currency,
     options: {
       username: username,
       password: answers.password,
       account: answers.account,
-      ledger: ledger
+      ledger: answers.ledger
     }
   }
 }

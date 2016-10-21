@@ -8,7 +8,7 @@ const askWalletQuestions = function * () {
     { type: 'input',
       name: 'db_uri',
       message: 'What is the address of your postgres DB?',
-      default: 'postgres://localhost/wallet' },
+      default: 'postgres://localhost/ilpkit' },
 
     // API_LEDGER_ADMIN_NAME
     { type: 'input',
@@ -25,20 +25,20 @@ const askWalletQuestions = function * () {
     // API_CLIENT_HOST, API_HOSTNAME
     { type: 'input',
       name: 'hostname',
-      message: 'What hostname will this wallet be running on?',
-      default: 'wallet.example.com' },
+      message: 'What hostname will this ilp-kit be running on?',
+      default: 'ilpkit.example.com' },
 
     // API_CLIENT_PORT, API_PUBLIC_PORT
     { type: 'input',
       name: 'public_port',
-      message: 'What port will you be running on?',
+      message: 'What port will you be running publicly on?',
       validate: valid.validateNumber,
       default: '443' },
 
     // API_SECRET
     { type: 'input',
       name: 'secret',
-      message: 'What secret key will your API use?',
+      message: 'What secret key will your ilp-kit use?',
       default: crypto.randomBytes(33).toString('base64') },
 
     // LEDGER_ILP_PREFIX
@@ -46,21 +46,9 @@ const askWalletQuestions = function * () {
       name: 'ledger_ilp_prefix',
       message: 'What is your ledger\'s ILP prefix?',
       validate: valid.validatePrefix,
-      default: 'test.' + crypto.randomBytes(3).toString('base64') + '.' },
+      default: 'test.' + crypto.randomBytes(2).toString('hex') + '.' },
 
     // ledger recommended connectors?
-
-    // LEDGER_ED25519_SECRET_KEY
-    { type: 'input',
-      name: 'ledger_ed25519',
-      message: 'What ed25519 secret key will your ledger use?',
-      default: crypto.randomBytes(33).toString('base64') },
-
-    // API_ED25519_SECRET_KEY
-    { type: 'input',
-      name: 'api_ed25519',
-      message: 'What ed25519 secret key will your API use?',
-      default: crypto.randomBytes(33).toString('base64') },
 
     { type: 'confirm',
       name: 'github',
@@ -91,7 +79,12 @@ const askWalletQuestions = function * () {
       name: 'mailgun_domain',
       message: 'What is your mailgun domain?',
       default: 'example.com',
-      when: (answers) => answers.mailgun}
+      when: (answers) => answers.mailgun },
+
+    { type: 'confirm',
+      name: 'connector',
+      message: 'Would you like to configure a connector?',
+      default: true }
   ])
 }
 

@@ -7,7 +7,6 @@
     "argparse": "^1.0.7",
     "base64url": "^2.0.0",
     "commander": "^2.9.0",
-    "ilp-connector": "~11.0.0",
     "ilp-plugin-ripple": "^2.1.0",
     "inquirer": "^1.1.3"
   },

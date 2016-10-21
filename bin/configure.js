@@ -36,24 +36,27 @@ if (typeof output !== 'string') {
 
 // start asking the questions
 co(function * () {
-  printHeader('Wallet and Ledger Configuration')
+  printHeader('ILP-Kit Configuration')
   const wallet = yield askWalletQuestions()
 
-  printHeader('General Connector Configuration')
-  const connector = yield askConnectorQuestions()
-
-  const numPlugins = connector.number
   const ledgers = {}
+  let connector = {}
 
-  // create each of the plugins
-  for (let i = 0; i < numPlugins; ++i) {
-    printHeader('Plugin ' + (i + 1) + ' Configuration')
+  if (wallet.connector) {
+    printHeader('Connector Configuration')
+    connector = yield askConnectorQuestions()
+    const numPlugins = connector.number
 
-    const ledger = yield askPluginQuestions()
-    ledgers[ledger.key] = {
-      plugin: ledger.plugin,
-      currency: ledger.currency,
-      options: ledger.options
+    // create each of the plugins
+    for (let i = 0; i < numPlugins; ++i) {
+      printHeader('Plugin ' + (i + 1) + ' Configuration')
+
+      const ledger = yield askPluginQuestions()
+      ledgers[ledger.key] = {
+        plugin: ledger.plugin,
+        currency: ledger.currency,
+        options: ledger.options
+      }
     }
   }
 
@@ -74,10 +77,13 @@ co(function * () {
   // assign all the environment variables
   const env = {}
   env.API_DB_URI = wallet.db_uri
-  env.API_ED25519_SECRET_KEY = wallet.api_ed25519
+  env.API_GITHUB_CLIENT_ID = wallet.github_id
+  env.API_GITHUB_CLIENT_SECRET = wallet.github_secret
   env.API_HOSTNAME = wallet.hostname
   env.API_LEDGER_ADMIN_NAME = wallet.admin_name
   env.API_LEDGER_ADMIN_PASS = wallet.admin_pass
+  env.API_MAILGUN_API_KEY = wallet.mailgun_api_key
+  env.API_MAILGUN_DOMAIN = wallet.mailgun_domain
   env.API_PORT = '3100'
   env.API_PRIVATE_HOSTNAME = 'localhost'
   env.API_PUBLIC_HTTPS = '1'
@@ -88,16 +94,23 @@ co(function * () {
   env.CLIENT_HOST = wallet.hostname
   env.CLIENT_PORT = '3010'
   env.CLIENT_PUBLIC_PORT = '443'
-  env.CONNECTOR_LEDGERS = JSON.stringify(ledgers)
-  env.CONNECTOR_LOG_LEVEL = connector.verbosity
-  env.CONNECTOR_MAX_HOLD_TIME = connector.hold
-  env.CONNECTOR_PEERS = connector.peers
-  env.CONNECTOR_PORT = connector.port
-  env.CONNECTOR_PUBLIC_URI = connector.uri
   env.DEBUG = 'ilp*,connection,rpc'
-  env.LEDGER_ED25519_SECRET_KEY = wallet.ledger_ed25519
   env.LEDGER_ILP_PREFIX = wallet.ledger_ilp_prefix
-  env.LEDGER_RECOMMENDED_CONNECTORS = JSON.stringify([connector.uri + ':' + connector.port])
+  env.LEDGER_RECOMMENDED_CONNECTORS = ''
+
+  if (wallet.connector) {
+    env.CONNECTOR_ENABLE = wallet.connector? 'true':null
+    env.CONNECTOR_LEDGERS = '\'' + JSON.stringify(ledgers) + '\''
+    env.CONNECTOR_LOG_LEVEL = connector.verbosity
+    env.CONNECTOR_MAX_HOLD_TIME = connector.hold
+    env.CONNECTOR_PEERS = connector.peers
+    env.CONNECTOR_PORT = '4000'
+  }
+
+  if (ledgers[wallet.ledger_ilp_prefix]) {
+    env.LEDGER_RECOMMENDED_CONNECTORS =
+      ledgers[wallet.ledger_ilp_prefix].options.username
+  }
 
   // write the environment to a docker-compatible env-file
   printInfo('Writing enviroment to "' + output + '"...')
