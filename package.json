@@ -1,7 +1,7 @@
 {
-  "name": "ilp-connector-cli",
+  "name": "ilp-connector-kit",
   "version": "4.0.2",
-  "description": "Simple tools start ILP connectors",
+  "description": "Simple tools start ILP Kit",
   "main": "index.js",
   "dependencies": {
     "argparse": "^1.0.7",
@@ -22,6 +22,6 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "ilp-connector-config": "bin/configure.js"
+    "ilp-kit-config": "bin/configure.js"
   }
 }

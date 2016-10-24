@@ -1,21 +1,21 @@
 # ilp-kit-cli [![npm][npm-image]][npm-url]
 
-[npm-image]: https://img.shields.io/npm/v/ilp-connector-cli.svg?style=flat
-[npm-url]: https://npmjs.org/package/ilp-connector-cli
+[npm-image]: https://img.shields.io/npm/v/ilp-kit-cli.svg?style=flat
+[npm-url]: https://npmjs.org/package/ilp-kit-cli
 
 > Utility scripts to configure and start [ILP Kit](https://github.com/interledgerjs/ilp-kit)
 
 ## Installation
 
 ```sh
-npm install -g ilp-connector-cli
+npm install -g ilp-kit-cli
 ```
 
 ## Usage
 
 ### Configuring
 
-In order to configure ILP Kit, all you have to do is run `ilp-connector-config
+In order to configure ILP Kit, all you have to do is run `ilp-kit-config
 -o config.list`. This will create an environment file called
 `config.list`, which can be used by ILP Kit (see '**Running**').  A
 command-line interface will walk you through the required steps.
@@ -29,7 +29,7 @@ plugins. You can edit the final output in the `CONNECTOR_LEDGERS` field of
 
 ### Running
 
-The environment file output by `ilp-connector-config` can be used to start
+The environment file output by `ilp-kit-config` can be used to start
 a ledger, UI, and connector. In the directory of ILP Kit, run:
 
 ```sh
