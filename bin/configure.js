@@ -62,17 +62,6 @@ co(function * () {
 
   // confirm before writing file
   printHeader('Output')
-  const confirmation = yield inquirer.prompt([
-    { type: 'confirm',
-      name: 'confirmed',
-      message: 'Write these options to "' + output + '"?',
-      default: 'true' }
-  ])
-  if (!confirmation.confirmed) {
-    console.log()
-    console.error('aborted by user.')
-    process.exit(1)
-  }
 
   // assign all the environment variables
   const env = {}
