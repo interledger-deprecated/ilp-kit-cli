@@ -1,6 +1,7 @@
 const inquirer = require('inquirer')
 const crypto = require('crypto')
 const valid = require('./validate')
+const chalk = require('chalk')
 
 const askWalletQuestions = function * () {
   return yield inquirer.prompt([
@@ -65,7 +66,12 @@ const askWalletQuestions = function * () {
 
     { type: 'confirm',
       name: 'github',
-      message: 'Would you like to configure login through github?',
+      message: chalk.grey(
+'A GitHub account can be linked to your ILP Kit, which allows users to\n',
+' create accounts linked to their GitHub accounts. In order to configure\n',
+' this functionality, you\'ll need to get your Github client ID and your\n',
+' GitHub client secret.\n\n'
+      ) + '  Would you like to configure login through github?',
       default: false },
 
     { type: 'input',
@@ -80,7 +86,12 @@ const askWalletQuestions = function * () {
 
     { type: 'confirm',
       name: 'mailgun',
-      message: 'Would you like to configure mailgun?',
+      message: chalk.grey(
+        'Mailgun can be used to send verification emails when users create\n',
+        ' new accounts. In order to use mailgun, you must create an account\n',
+        ' on their site, http://www.mailgun.com/, get an API key, and associate\n',
+        ' a web hosting domain.\n\n'
+      ) + '  Would you like to configure mailgun?',
       default: false },
 
     { type: 'input',
@@ -96,7 +107,12 @@ const askWalletQuestions = function * () {
 
     { type: 'confirm',
       name: 'connector',
-      message: 'Would you like to configure a connector?',
+      message: chalk.grey(
+        'In order to send payments between your ILP Kit and others\', you\'ll need\n',
+        ' to run a connector. A connector has credentials on several different ledgers\n',
+        ' and it trades between them. You can always come back and run a connector\n',
+        ' later, or run it separately from your ILP Kit.\n\n'
+      ) + '  Would you like to configure a connector?',
       default: true }
   ])
 }

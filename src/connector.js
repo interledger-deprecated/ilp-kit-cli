@@ -1,5 +1,6 @@
 const inquirer = require('inquirer')
 const valid = require('./validate')
+const chalk = require('chalk')
 
 const askConnectorQuestions = function * () {
   return yield inquirer.prompt([
@@ -28,7 +29,12 @@ const askConnectorQuestions = function * () {
     // number of plugins
     { type: 'input',
       name: 'number',
-      message: 'How many ledger connections (plugins) will your connector have?',
+      message: chalk.grey(
+        'Your connector needs one \'plugin\' for each of the ledgers that it\n',
+        ' connects. You should configure one of these connections to log into an\n',
+        ' account on your own ILP Kit. Every plugin needs a username, password,\n',
+        ' and account URI, along with the ledger address and currency.\n\n'
+      ) + '  How many ledger connections (plugins) will your connector have?',
       validate: valid.validateNumber,
       default: '2' }
   ])
