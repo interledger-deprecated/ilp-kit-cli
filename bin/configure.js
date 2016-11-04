@@ -107,8 +107,8 @@ co(function * () {
   fs.writeFileSync(
     output,
     Object.keys(env).reduce((out, key) => (
-      (env[key]) ? (out + key + '=' + env[key] + '\n') : (out)
-    ), '')
+      (env[key]) ? (out + 'export ' + key + '=' + env[key] + '\n') : (out)
+    ), '#!/bin/bash\n')
   )
   printInfo('Done.')
 }).catch((e) => {
