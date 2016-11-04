@@ -1,6 +1,6 @@
 {
-  "name": "ilp-connector-kit",
-  "version": "4.0.2",
+  "name": "ilp-kit-cli",
+  "version": "4.0.3",
   "description": "Simple tools start ILP Kit",
   "main": "index.js",
   "dependencies": {
