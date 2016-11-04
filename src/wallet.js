@@ -11,13 +11,13 @@ const askWalletQuestions = function * () {
       message: 'What is the address of your postgres DB?',
       default: 'postgres://localhost/ilpkit' },
 
-    // API_LEDGER_ADMIN_NAME
+    // LEDGER_ADMIN_NAME
     { type: 'input',
       name: 'admin_name',
       message: 'What is the username of your ledger\'s admin account?',
       default: 'admin' },
 
-    // API_LEDGER_ADMIN_PASS
+    // LEDGER_ADMIN_PASS
     { type: 'input',
       name: 'admin_pass',
       message: 'What is the password to your ledger\'s admin account?',
