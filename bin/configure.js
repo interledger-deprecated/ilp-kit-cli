@@ -84,7 +84,7 @@ co(function * () {
   env.CLIENT_HOST = wallet.hostname
   env.CLIENT_PORT = '3010'
   env.CLIENT_PUBLIC_PORT = '443'
-  env.LEDGER_ADMIN_NAME = wallet.admin_name
+  env.LEDGER_ADMIN_USER = wallet.admin_user
   env.LEDGER_ADMIN_PASS = wallet.admin_pass
   env.LEDGER_CURRENCY_CODE = wallet.ledger_currency_code
   env.LEDGER_CURRENCY_SYMBOL = wallet.ledger_currency_symbol
