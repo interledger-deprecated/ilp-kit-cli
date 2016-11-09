@@ -7,7 +7,7 @@ const askConnectorQuestions = function * () {
     // CONNECTOR_PEERS
     { type: 'input',
       name: 'peers',
-      message: 'Give the HTTP addresses of any connectors you wish to peer with (comma-separated list)',
+      message: 'Give the ILP addresses of any connectors you wish to peer with (comma-separated list)',
       validate: valid.validatePeers,
       filter: (s) => (s.replace(/\s*,\s*/g, ',')),
       default: '' },
