@@ -10,6 +10,7 @@ const chalk = require('chalk')
 const askPluginQuestions = require('../src/plugin.js')
 const askConnectorQuestions = require('../src/connector.js')
 const askWalletQuestions = require('../src/wallet.js')
+const parseExisting = require('../src/parse.js')
 
 // Text formatting functions
 const printHeader = (s) => {
@@ -26,32 +27,35 @@ commander
   .parse(process.argv)
 
 const output = commander.output
+const env = {}
+
 if (typeof output !== 'string') {
   commander.outputHelp()
   console.error('Missing output file. Specify an env file to output to with "-o" or "--output"')
   process.exit(1)
 } else if (fs.existsSync(output)) {
-  printInfo('Will overwrite "' + output + '". Cancel now if you aren\'t ok with that.')
+  printInfo('Will load defaults from "' + output + '", then overwrite. Cancel now if you aren\'t ok with that.')
+  Object.assign(env, parseExisting(output))
 }
 
 // start asking the questions
 co(function * () {
   printHeader('ILP-Kit Configuration')
-  const wallet = yield askWalletQuestions()
+  const wallet = yield askWalletQuestions(env)
 
   const ledgers = {}
   let connector = {}
 
   if (wallet.connector) {
     printHeader('Connector Configuration')
-    connector = yield askConnectorQuestions()
+    connector = yield askConnectorQuestions(env)
     const numPlugins = connector.number
 
     // create each of the plugins
     for (let i = 0; i < numPlugins; ++i) {
       printHeader('Plugin ' + (i + 1) + ' Configuration')
 
-      const ledger = yield askPluginQuestions()
+      const ledger = yield askPluginQuestions(env)
       ledgers[ledger.key] = {
         plugin: ledger.plugin,
         currency: ledger.currency,
@@ -64,7 +68,6 @@ co(function * () {
   printHeader('Output')
 
   // assign all the environment variables
-  const env = {}
   env.API_DB_URI = wallet.db_uri
   env.API_GITHUB_CLIENT_ID = wallet.github_id
   env.API_GITHUB_CLIENT_SECRET = wallet.github_secret
@@ -84,7 +87,7 @@ co(function * () {
   env.LEDGER_ADMIN_NAME = wallet.admin_name
   env.LEDGER_ADMIN_PASS = wallet.admin_pass
   env.LEDGER_CURRENCY_CODE = wallet.ledger_currency_code
-  env.LEDGER_CURRENCY_SYMBOL = '\'' + wallet.ledger_currency_symbol + '\''
+  env.LEDGER_CURRENCY_SYMBOL = wallet.ledger_currency_symbol
   env.LEDGER_ILP_PREFIX = wallet.ledger_ilp_prefix
   env.LEDGER_RECOMMENDED_CONNECTORS = ''
 
@@ -107,7 +110,7 @@ co(function * () {
   fs.writeFileSync(
     output,
     Object.keys(env).reduce((out, key) => (
-      (env[key]) ? (out + 'export ' + key + '=' + env[key] + '\n') : (out)
+      (env[key]) ? (out + 'export ' + key + '=\'' + env[key] + '\'\n') : (out)
     ), '#!/bin/bash\n')
   )
   printInfo('Done.')

@@ -3,64 +3,57 @@ const crypto = require('crypto')
 const valid = require('./validate')
 const chalk = require('chalk')
 
-const askWalletQuestions = function * () {
+const askWalletQuestions = function * (env) {
   return yield inquirer.prompt([
     // API_DB_URI
     { type: 'input',
       name: 'db_uri',
       message: 'What is the address of your postgres DB?',
-      default: 'postgres://localhost/ilpkit' },
+      default: env.API_DB_URI || 'postgres://localhost/ilpkit' },
 
     // LEDGER_ADMIN_NAME
     { type: 'input',
       name: 'admin_name',
       message: 'What is the username of your ledger\'s admin account?',
-      default: 'admin' },
+      default: env.LEDGER_ADMIN_NAME || 'admin' },
 
     // LEDGER_ADMIN_PASS
     { type: 'input',
       name: 'admin_pass',
       message: 'What is the password to your ledger\'s admin account?',
-      default: crypto.randomBytes(15).toString('base64') },
+      default: env.LEDGER_ADMIN_PASS || crypto.randomBytes(15).toString('base64') },
 
     // API_CLIENT_HOST, API_HOSTNAME
     { type: 'input',
       name: 'hostname',
       message: 'What hostname will this ilp-kit be running on?',
-      default: 'ilpkit.example.com' },
-
-    // API_CLIENT_PORT, API_PUBLIC_PORT
-    { type: 'input',
-      name: 'public_port',
-      message: 'What port will you be running publicly on?',
-      validate: valid.validateNumber,
-      default: '443' },
+      default: env.API_HOSTNAME || 'ilpkit.example.com' },
 
     // API_SECRET
     { type: 'input',
       name: 'secret',
       message: 'What secret key will your ilp-kit use?',
-      default: crypto.randomBytes(33).toString('base64') },
+      default: env.API_SECRET || crypto.randomBytes(33).toString('base64') },
 
     // LEDGER_CURRENCY_CODE
     { type: 'input',
       name: 'ledger_currency_code',
       message: 'What is your ledger\'s currency code?',
       validate: valid.validateCurrency,
-      default: 'USD' },
+      default: env.LEDGER_CURRENCY_CODE || 'USD' },
 
     // LEDGER_CURRENCY_SYMBOL
     { type: 'input',
       name: 'ledger_currency_symbol',
       message: 'What is your ledger\'s currency symbol?',
-      default: '$' },
+      default: env.LEDGER_CURRENCY_SYMBOL || '$' },
 
     // LEDGER_ILP_PREFIX
     { type: 'input',
       name: 'ledger_ilp_prefix',
       message: 'What is your ledger\'s ILP prefix?',
       validate: valid.validatePrefix,
-      default: 'test.' + crypto.randomBytes(2).toString('hex') + '.' },
+      default: env.LEDGER_ILP_PREFIX || 'test.' + crypto.randomBytes(2).toString('hex') + '.' },
 
     // ledger recommended connectors?
 
@@ -72,16 +65,18 @@ const askWalletQuestions = function * () {
 ' this functionality, you\'ll need to get your Github client ID and your\n',
 ' GitHub client secret.\n\n'
       ) + '  Would you like to configure login through github?',
-      default: false },
+      default: !!env.API_GITHUB_CLIENT_ID || false },
 
     { type: 'input',
       name: 'github_id',
       message: 'What is your github client ID?',
+      default: env.API_GITHUB_CLIENT_ID || '',
       when: (answers) => answers.github},
 
     { type: 'input',
       name: 'github_secret',
       message: 'What is your github client secret?',
+      default: env.API_GITHUB_CLIENT_SECRET || '',
       when: (answers) => answers.github},
 
     { type: 'confirm',
@@ -92,17 +87,18 @@ const askWalletQuestions = function * () {
         ' on their site, http://www.mailgun.com/, get an API key, and associate\n',
         ' a web hosting domain.\n\n'
       ) + '  Would you like to configure mailgun?',
-      default: false },
+      default: !!env.API_MAILGUN_API_KEY || false },
 
     { type: 'input',
       name: 'mailgun_api_key',
       message: 'What is your mailgun API key?',
+      default: env.API_MAILGUN_API_KEY || '',
       when: (answers) => answers.mailgun},
 
     { type: 'input',
       name: 'mailgun_domain',
       message: 'What is your mailgun domain?',
-      default: 'example.com',
+      default: env.API_MAILGUN_API_KEY || 'example.com',
       when: (answers) => answers.mailgun },
 
     { type: 'confirm',
@@ -113,7 +109,7 @@ const askWalletQuestions = function * () {
         ' and it trades between them. You can always come back and run a connector\n',
         ' later, or run it separately from your ILP Kit.\n\n'
       ) + '  Would you like to configure a connector?',
-      default: true }
+      default: !!env.CONNECTOR_ENABLE }
   ])
 }
 

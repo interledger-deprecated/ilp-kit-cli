@@ -2,7 +2,7 @@ const inquirer = require('inquirer')
 const valid = require('./validate')
 const chalk = require('chalk')
 
-const askConnectorQuestions = function * () {
+const askConnectorQuestions = function * (env) {
   return yield inquirer.prompt([
     // CONNECTOR_PEERS
     { type: 'input',
@@ -10,20 +10,20 @@ const askConnectorQuestions = function * () {
       message: 'Give the ILP addresses of any connectors you wish to peer with (comma-separated list)',
       validate: valid.validatePeers,
       filter: (s) => (s.replace(/\s*,\s*/g, ',')),
-      default: '' },
+      default: env.CONNECTOR_PEERS || '' },
 
     // CONNECTOR_MAX_HOLD_TIME
     { type: 'input',
       name: 'hold',
       message: 'What is the maximum time you will put funds on hold (in seconds)?',
       validate: valid.validateNumber,
-      default: '100' },
+      default: env.CONNECTOR_MAX_HOLD_TIME || '100' },
 
     // CONNECTOR_LOG_LEVEL
     { type: 'list',
       name: 'verbosity',
       message: 'What level of verbosity would you like?',
-      default: 'info',
+      default: env.CONNECTOR_LOG_LEVEL || 'info',
       choices: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] },
 
     // number of plugins
