@@ -93,7 +93,7 @@ co(function * () {
 
   if (wallet.connector) {
     env.CONNECTOR_ENABLE = wallet.connector ? 'true' : null
-    env.CONNECTOR_LEDGERS = '\'' + JSON.stringify(ledgers) + '\''
+    env.CONNECTOR_LEDGERS = JSON.stringify(ledgers).replace(/'/g, '\'\\\'\'')
     env.CONNECTOR_LOG_LEVEL = connector.verbosity
     env.CONNECTOR_MAX_HOLD_TIME = connector.hold
     env.CONNECTOR_PEERS = connector.peers
