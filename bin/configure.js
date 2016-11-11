@@ -6,9 +6,11 @@ const commander = require('commander')
 const inquirer = require('inquirer')
 const co = require('co')
 const chalk = require('chalk')
+const crypto = require('crypto')
 
 const askPluginQuestions = require('../src/plugin.js')
 const askConnectorQuestions = require('../src/connector.js')
+const currency = require('../src/currency.js')
 const askWalletQuestions = require('../src/wallet.js')
 const parseExisting = require('../src/parse.js')
 
@@ -35,85 +37,96 @@ if (typeof output !== 'string') {
   process.exit(1)
 } else if (fs.existsSync(output)) {
   printInfo('Will load defaults from "' + output + '", then overwrite. Cancel now if you aren\'t ok with that.')
-  Object.assign(env, parseExisting(output))
+  // Object.assign(env, parseExisting(output))
 }
 
 // start asking the questions
 co(function * () {
   printHeader('ILP-Kit Configuration')
+  printInfo('This section covers the configuration of your ledger and web UI. If you want to configure advanced options like mailgun configuration (to send verification emails) or github oath login, edit ' + output + ' after running this program.')
   const wallet = yield askWalletQuestions(env)
 
+  printHeader('Connector Configuration')
+  printInfo('Your connector is what gets you linked up to the rest of the Interledger. You\'ll need an account on at least one ledger that isn\'t your own in order for your connector to trade between the two ledgers. If you don\'t have any accounts right now then that\'s ok; you can enter placeholder credentials and register the account later.')
+  const connector = yield askConnectorQuestions(env)
+  
   const ledgers = {}
-  let connector = {}
+  let plugin
+  do {
+    printHeader('Plugin #' + (Object.keys(ledgers).length + 1))
+    printInfo('A plugin is your connection to an individual ledger. It needs your credentials on that ledger to get you connected.')
+    plugin = yield askPluginQuestions(connector)
+    ledgers[plugin.prefix] = {
+      plugin: 'ilp-plugin-bells',
+      currency: plugin.currency,
+      options: {
+        identifier: plugin.identifier,
+        password: plugin.password
+      } 
+    }
+  } while (plugin.another === true)
 
-  if (wallet.connector) {
-    printHeader('Connector Configuration')
-    connector = yield askConnectorQuestions(env)
-    const numPlugins = connector.number
+  // compile all of the user input into a useful file
+  printHeader('Output')
 
-    // create each of the plugins
-    for (let i = 0; i < numPlugins; ++i) {
-      printHeader('Plugin ' + (i + 1) + ' Configuration')
+  const name = wallet.name
+  const prefix = wallet.country.toLowerCase()
+    + '.' + wallet.currency.toLowerCase()
+    + '.' + name.toLowerCase()
+    + '.'
 
-      const ledger = yield askPluginQuestions(env)
-      ledgers[ledger.key] = {
-        plugin: ledger.plugin,
-        currency: ledger.currency,
-        options: ledger.options
-      }
+  ledgers[prefix] = {
+    currency: wallet.currency,
+    plugin: 'ilp-plugin-bells',
+    options: {
+      account: 'https://' + wallet.hostname + '/ledger/accounts/' + connector.username,
+      password: connector.password
     }
   }
 
-  // confirm before writing file
-  printHeader('Output')
-
   // assign all the environment variables
   env.API_DB_URI = wallet.db_uri
-  env.API_GITHUB_CLIENT_ID = wallet.github_id
-  env.API_GITHUB_CLIENT_SECRET = wallet.github_secret
+  env.API_GITHUB_CLIENT_ID = ''
+  env.API_GITHUB_CLIENT_SECRET = ''
   env.API_HOSTNAME = wallet.hostname
-  env.API_MAILGUN_API_KEY = wallet.mailgun_api_key
-  env.API_MAILGUN_DOMAIN = wallet.mailgun_domain
+  env.API_MAILGUN_API_KEY = ''
+  env.API_MAILGUN_DOMAIN = ''
   env.API_PORT = '3100'
   env.API_PRIVATE_HOSTNAME = 'localhost'
   env.API_PUBLIC_HTTPS = '1'
   env.API_PUBLIC_PATH = '/api'
   env.API_PUBLIC_PORT = '443'
-  env.API_SECRET = wallet.secret
+  env.API_SECRET = crypto.randomBytes(33).toString('base64')
   env.BLUEBIRD_WARNINGS = '0'
   env.CLIENT_HOST = wallet.hostname
   env.CLIENT_PORT = '3010'
   env.CLIENT_PUBLIC_PORT = '443'
-  env.LEDGER_ADMIN_USER = wallet.admin_user
-  env.LEDGER_ADMIN_PASS = wallet.admin_pass
-  env.LEDGER_CURRENCY_CODE = wallet.ledger_currency_code
-  env.LEDGER_CURRENCY_SYMBOL = wallet.ledger_currency_symbol
-  env.LEDGER_ILP_PREFIX = wallet.ledger_ilp_prefix
+  env.CLIENT_TITLE = name.charAt(0).toUpperCase() + name.split('').slice(1).join('')
+  env.LEDGER_ADMIN_USER = 'admin'
+  env.LEDGER_ADMIN_PASS = crypto.randomBytes(18).toString('base64')
+  env.LEDGER_CURRENCY_CODE = wallet.currency
+  env.LEDGER_CURRENCY_SYMBOL = currency[wallet.currency] || wallet.currency
+  env.LEDGER_ILP_PREFIX = prefix
   env.LEDGER_RECOMMENDED_CONNECTORS = ''
 
-  if (wallet.connector) {
-    env.CONNECTOR_ENABLE = wallet.connector ? 'true' : null
-    env.CONNECTOR_LEDGERS = JSON.stringify(ledgers).replace(/'/g, '\'\\\'\'')
-    env.CONNECTOR_LOG_LEVEL = connector.verbosity
-    env.CONNECTOR_MAX_HOLD_TIME = connector.hold
-    env.CONNECTOR_PEERS = connector.peers
-    env.CONNECTOR_PORT = '4000'
-  }
-
-  if (ledgers[wallet.ledger_ilp_prefix]) {
-    env.LEDGER_RECOMMENDED_CONNECTORS =
-      ledgers[wallet.ledger_ilp_prefix].options.username
-  }
+  env.CONNECTOR_ENABLE = 'true'
+  env.CONNECTOR_LEDGERS = JSON.stringify(ledgers).replace(/'/g, '\'\\\'\'')
+  env.CONNECTOR_LOG_LEVEL = 'info'
+  env.CONNECTOR_MAX_HOLD_TIME = '100'
+  env.CONNECTOR_PEERS = connector.peers
+  env.CONNECTOR_PORT = '4000'
+  env.LEDGER_RECOMMENDED_CONNECTORS = connector.username
 
   // write the environment to a docker-compatible env-file
   printInfo('Writing enviroment to "' + output + '"...')
   fs.writeFileSync(
     output,
     Object.keys(env).reduce((out, key) => (
-      (env[key]) ? (out + 'export ' + key + '=\'' + env[key] + '\'\n') : (out)
-    ), '#!/bin/bash\n')
+      (out + key + '=' + env[key] + '\n')
+    ), '')
   )
   printInfo('Done.')
+
 }).catch((e) => {
   console.error(e)
   process.exit(1)
