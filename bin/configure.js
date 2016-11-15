@@ -86,11 +86,11 @@ co(function * () {
 
   // assign all the environment variables
   env.API_DB_URI = wallet.db_uri
-  env.API_GITHUB_CLIENT_ID = ''
-  env.API_GITHUB_CLIENT_SECRET = ''
+  env.API_GITHUB_CLIENT_ID = wallet.github_id || ''
+  env.API_GITHUB_CLIENT_SECRET = wallet.github_secret || ''
   env.API_HOSTNAME = wallet.hostname
-  env.API_MAILGUN_API_KEY = ''
-  env.API_MAILGUN_DOMAIN = ''
+  env.API_MAILGUN_API_KEY = wallet.mailgun_api_key || ''
+  env.API_MAILGUN_DOMAIN = wallet.mailgun_domain || ''
   env.API_PORT = '3100'
   env.API_PRIVATE_HOSTNAME = 'localhost'
   env.API_PUBLIC_HTTPS = '1'
