@@ -6,8 +6,8 @@ const co = require('co')
 
 const configure = require('../src/configure')
 const key = require('../src/key')
-//const addPeer = require('../src/addPeer')
-//const removePeer = require('../src/removePeer')
+const addPeer = require('../src/add_peer')
+const removePeer = require('../src/remove_peer')
 
 const handle = (p) => {
   p.catch((e) => {
@@ -19,22 +19,36 @@ const handle = (p) => {
 commander
   .version('3.0.0')
   .command('key')
+  .description('generate a public key from a secret (or from a random string)')
   .action(() => {
     handle(co(key))
   })
 
 commander
   .command('configure [file]')
+  .description('follow step-by-step instructions to generate a complete ilp-kit configuration')
   .action((file) => {
     handle(co.wrap(configure)(file))
   })
 
-/*
 commander
   .command('add-peer [file]')
+  .description('using an MQTT broker and a peer\'s public key, connect your connector to them')
+  .action((file) => {
+    handle(co.wrap(addPeer)(file))
+  })
 
 commander
   .command('remove-peer [file]') 
-*/
+  .description('delete one of the plugins in your configuration file')
+  .action((file) => {
+    handle(co.wrap(removePeer)(file))
+  })
 
-commander.parse(process.argv)
+if (!process.argv.slice(2).length) {
+  commander.outputHelp()
+  process.exit(1)
+}
+
+commander
+  .parse(process.argv)

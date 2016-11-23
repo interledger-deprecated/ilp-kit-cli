@@ -26,8 +26,7 @@ module.exports = co.wrap(function * (output) {
     console.error('Missing output file. Specify an env file to output to with "-o" or "--output"')
     process.exit(1)
   } else if (fs.existsSync(output)) {
-    printInfo('Will load defaults from "' + output + '", then overwrite. Cancel now if you aren\'t ok with that.')
-    // Object.assign(env, parseExisting(output))
+    printInfo('Will overwrite "' + output + '". Cancel now if you aren\'t ok with that.')
   }
 
   // start asking the questions
@@ -37,8 +36,24 @@ module.exports = co.wrap(function * (output) {
 
   printHeader('Connector Configuration')
   printInfo('Your connector is what gets you linked up to the rest of the Interledger. You\'ll need an account on at least one ledger that isn\'t your own in order for your connector to trade between the two ledgers. If you don\'t have any accounts right now then that\'s ok; you can enter placeholder credentials and register the account later.')
+
+  const ledgers = {}
   const connector = yield askConnectorQuestions(env)
-  
+  const name = wallet.name
+  const prefix = wallet.country.toLowerCase()
+    + '.' + wallet.currency.toLowerCase()
+    + '.' + name.toLowerCase()
+    + '.'
+
+  ledgers[prefix] = {
+    currency: wallet.currency,
+    plugin: 'ilp-plugin-bells',
+    options: {
+      account: 'https://' + wallet.hostname + '/ledger/accounts/' + connector.username,
+      password: connector.password
+    }
+  }  
+
   // assign all the environment variables
   env.API_DB_URI = wallet.db_uri
   env.API_GITHUB_CLIENT_ID = wallet.github_id || ''
