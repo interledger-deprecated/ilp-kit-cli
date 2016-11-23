@@ -22,8 +22,7 @@ module.exports = co.wrap(function * (output) {
   const env = {}
 
   if (typeof output !== 'string') {
-    commander.outputHelp()
-    console.error('Missing output file. Specify an env file to output to with "-o" or "--output"')
+    console.error('Missing output file. Use \'--help\' for options.')
     process.exit(1)
   } else if (fs.existsSync(output)) {
     printInfo('Will overwrite "' + output + '". Cancel now if you aren\'t ok with that.')
@@ -84,7 +83,7 @@ module.exports = co.wrap(function * (output) {
   env.CONNECTOR_LEDGERS = JSON.stringify(ledgers)
   env.CONNECTOR_LOG_LEVEL = 'info'
   env.CONNECTOR_MAX_HOLD_TIME = '100'
-  env.CONNECTOR_PEERS = connector.peers
+  env.CONNECTOR_AUTOLOAD_PEERS = 'true'
   env.CONNECTOR_PORT = '4000'
   env.LEDGER_RECOMMENDED_CONNECTORS = connector.username
 

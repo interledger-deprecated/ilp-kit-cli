@@ -5,12 +5,12 @@ const printInfo = (s) => {
   console.info(chalk.gray(s))
 }
 
-module.exports = function * (file, callback) {
+module.exports = function * (file, callback, dryRun) {
   const env = {}
 
   // TODO: variables _can_ be multiline or use shell interpolation
   for (let line of fs.readFileSync(file, 'utf-8').split('\n')) {
-    const match = line.match(/^(.+?)=(.+?)$/)
+    const match = line.match(/^(.+?)=(.*?)$/)
     if (!match) continue
 
     try {
@@ -21,6 +21,8 @@ module.exports = function * (file, callback) {
       env[match[1]] = match[2]
     }
   }
+
+  if (dryRun) return
 
   printInfo('Writing enviroment to "' + file + '"...')
   fs.writeFileSync(

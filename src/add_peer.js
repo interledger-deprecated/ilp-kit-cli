@@ -19,8 +19,7 @@ const printInfo = (s) => {
 module.exports = co.wrap(function * (output) {
 
   if (typeof output !== 'string') {
-    commander.outputHelp()
-    console.error('Missing output file. Specify an env file to output to with "-o" or "--output"')
+    console.error('Missing output file. Use \'--help\' for options.')
     process.exit(1)
   } else if (fs.existsSync(output)) {
     printInfo('Will modify "' + output + '". Cancel now if you aren\'t ok with that.')
@@ -30,6 +29,10 @@ module.exports = co.wrap(function * (output) {
   }
 
   const answers = yield inquirer.prompt([
+    { type: 'input',
+      name: 'name',
+      message: 'What would you like to name this trustline? (optional)' },
+
     { type: 'input',
       name: 'broker',
       message: 'What MQTT broker will you be using?',
@@ -70,6 +73,7 @@ module.exports = co.wrap(function * (output) {
     currency: answers.currency,
     plugin: 'ilp-plugin-virtual',
     options: {
+      name: answers.name,
       secret: answers.secret,
       peerPublicKey: answers.publicKey,
       prefix: ledgerName,

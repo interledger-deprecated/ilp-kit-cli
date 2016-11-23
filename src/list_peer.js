@@ -20,13 +20,11 @@ module.exports = co.wrap(function * (output) {
   if (typeof output !== 'string') {
     console.error('Missing output file. Use \'--help\' for options.')
     process.exit(1)
-  } else if (fs.existsSync(output)) {
-    printInfo('Will modify "' + output + '". Cancel now if you aren\'t ok with that.')
-  } else {
+  } else if (!fs.existsSync(output)) {
     console.error('"' + output + '" does not yet exist. Run \'configure\' to create it.')
     process.exit(1)
   }
-  
+
   yield parse(output, function * (variable, value) {
     if (variable === 'CONNECTOR_LEDGERS') {
       const ledgers = JSON.parse(value)
@@ -38,19 +36,9 @@ module.exports = co.wrap(function * (output) {
         console.error('No trustlines have been configured yet.')
         process.exit(1)
       }
-      
+
       printTrustlines(trustlines, ledgers)
-
-      const answers = yield inquirer.prompt([
-        { type: 'list',
-          message: 'Which connection would you like to remove?',
-          name: 'deleted',
-          choices: trustlines }
-      ])
-
-      delete ledgers[answers.deleted]
-      return JSON.stringify(ledgers)
     }
     return value
-  })
+  }, true) // dry-run mode, don't write anything
 })

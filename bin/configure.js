@@ -8,6 +8,7 @@ const configure = require('../src/configure')
 const key = require('../src/key')
 const addPeer = require('../src/add_peer')
 const removePeer = require('../src/remove_peer')
+const listPeer = require('../src/list_peer')
 
 const handle = (p) => {
   p.catch((e) => {
@@ -32,17 +33,24 @@ commander
   })
 
 commander
-  .command('add-peer [file]')
+  .command('peer-add [file]')
   .description('using an MQTT broker and a peer\'s public key, connect your connector to them')
   .action((file) => {
     handle(co.wrap(addPeer)(file))
   })
 
 commander
-  .command('remove-peer [file]') 
+  .command('peer-remove [file]') 
   .description('delete one of the plugins in your configuration file')
   .action((file) => {
     handle(co.wrap(removePeer)(file))
+  })
+
+commander
+  .command('peer-list [file]') 
+  .description('delete one of the plugins in your configuration file')
+  .action((file) => {
+    handle(co.wrap(listPeer)(file))
   })
 
 if (!process.argv.slice(2).length) {
