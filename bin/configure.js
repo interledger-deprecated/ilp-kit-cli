@@ -3,6 +3,7 @@
 
 const commander = require('commander')
 const co = require('co')
+const chalk = require('chalk')
 
 const configure = require('../src/configure')
 const key = require('../src/key')
@@ -33,30 +34,35 @@ commander
   })
 
 commander
-  .command('peer-add [file]')
+  .command('peer [file]')
   .description('using an MQTT broker and a peer\'s public key, connect your connector to them')
   .action((file) => {
     handle(co.wrap(addPeer)(file))
   })
 
 commander
-  .command('peer-remove [file]') 
+  .command('unpeer [file]') 
   .description('delete one of the plugins in your configuration file')
   .action((file) => {
     handle(co.wrap(removePeer)(file))
   })
 
 commander
-  .command('peer-list [file]') 
-  .description('delete one of the plugins in your configuration file')
+  .command('list [file]') 
+  .description('list peers in your configuration file.')
   .action((file) => {
     handle(co.wrap(listPeer)(file))
   })
 
-if (!process.argv.slice(2).length) {
+const argv = process.argv
+const argc = argv.slice(2).length
+if (!argc) {
   commander.outputHelp()
   process.exit(1)
+} else if (argc === 1 && argv[2] !== 'key') {
+  console.info(chalk.grey('Using "env.list" as default file.'))
+  argv.push('env.list')
 }
 
 commander
-  .parse(process.argv)
+  .parse(argv)
