@@ -11,6 +11,7 @@ const currencies = require('./currency')
 const path = require('path')
 const fs = require('fs')
 const parse = require('./parse')
+const getSecret = require('./secret')
 
 const printInfo = (s) => {
   console.info(chalk.gray(s))
@@ -28,6 +29,8 @@ module.exports = co.wrap(function * (output) {
     process.exit(1)
   }
 
+  const secret = yield getSecret(output)
+
   const answers = yield inquirer.prompt([
     { type: 'input',
       name: 'name',
@@ -39,11 +42,6 @@ module.exports = co.wrap(function * (output) {
       validate: (a) => !!(a.length),
       // TODO: should this have a real test broker in here?
       default: 'mqtt://broker.hivemq.com:1883'},
-
-    { type: 'input',
-      name: 'secret',
-      message: 'What is your (base64url encoded) secret?',
-      validate: (a) => !!(a.length > 1) },
 
     { type: 'input',
       name: 'publicKey',
@@ -64,17 +62,17 @@ module.exports = co.wrap(function * (output) {
   ])
 
   const token = base64url(sodium.crypto_scalarmult(
-    sodium.crypto_hash_sha256(base64url.toBuffer(answers.secret)),
+    sodium.crypto_hash_sha256(base64url.toBuffer(secret)),
     base64url.toBuffer(answers.publicKey)
   ))
   
-  const ledgerName = 'peer.' + token.substring(0, 5) + '.'
+  const ledgerName = 'peer.' + token.substring(0, 5) + '.' + answers.currency.toLowerCase() + '.'
   const ledger = {
     currency: answers.currency,
     plugin: 'ilp-plugin-virtual',
     options: {
       name: answers.name,
-      secret: answers.secret,
+      secret: secret,
       peerPublicKey: answers.publicKey,
       prefix: ledgerName,
       broker: answers.broker,

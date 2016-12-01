@@ -10,6 +10,7 @@ const path = require('path')
 const fs = require('fs')
 const parse = require('./parse')
 const printTrustlines = require('./trustlines')
+const getSecret = require('./secret')
 
 const printInfo = (s) => {
   console.info(chalk.gray(s))
@@ -25,6 +26,8 @@ module.exports = co.wrap(function * (output) {
     process.exit(1)
   }
 
+  const secret = yield getSecret(output)
+
   yield parse(output, function * (variable, value) {
     if (variable === 'CONNECTOR_LEDGERS') {
       const ledgers = JSON.parse(value)
@@ -37,7 +40,7 @@ module.exports = co.wrap(function * (output) {
         process.exit(1)
       }
 
-      printTrustlines(trustlines, ledgers)
+      printTrustlines(trustlines, ledgers, secret)
     }
     return value
   }, true) // dry-run mode, don't write anything
