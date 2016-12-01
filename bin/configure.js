@@ -19,7 +19,7 @@ const handle = (p) => {
 }
 
 commander
-  .version('6.0.0')
+  .version('7.0.1')
   .command('key')
   .description('generate a public key from a secret (or from a random string)')
   .action(() => {
