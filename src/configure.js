@@ -39,6 +39,7 @@ module.exports = co.wrap(function * (output) {
   const ledgers = {}
   const connector = yield askConnectorQuestions(env)
   const name = wallet.name
+  const title = name.charAt(0).toUpperCase() + name.split('').slice(1).join('')
   const prefix = wallet.country.toLowerCase()
     + '.' + wallet.currency.toLowerCase()
     + '.' + name.toLowerCase()
@@ -55,6 +56,8 @@ module.exports = co.wrap(function * (output) {
 
   // assign all the environment variables
   env.API_DB_URI = wallet.db_uri
+  env.API_EMAIL_SENDER_NAME = title
+  env.API_EMAIL_SENDER_ADDRESS = 'ilpkit@' + wallet.hostname
   env.API_GITHUB_CLIENT_ID = wallet.github_id || ''
   env.API_GITHUB_CLIENT_SECRET = wallet.github_secret || ''
   env.API_HOSTNAME = wallet.hostname
@@ -70,7 +73,7 @@ module.exports = co.wrap(function * (output) {
   env.CLIENT_HOST = wallet.hostname
   env.CLIENT_PORT = '3010'
   env.CLIENT_PUBLIC_PORT = '443'
-  env.CLIENT_TITLE = name.charAt(0).toUpperCase() + name.split('').slice(1).join('')
+  env.CLIENT_TITLE = title
   env.LEDGER_ADMIN_USER = 'admin'
   env.LEDGER_ADMIN_PASS = crypto.randomBytes(18).toString('base64')
   env.LEDGER_CURRENCY_CODE = wallet.currency
