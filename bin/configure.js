@@ -41,7 +41,7 @@ commander
   })
 
 commander
-  .command('unpeer [file]') 
+  .command('depeer [file]') 
   .description('delete one of the plugins in your configuration file')
   .action((file) => {
     handle(co.wrap(removePeer)(file))
