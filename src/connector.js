@@ -2,6 +2,7 @@ const inquirer = require('inquirer')
 const valid = require('./validate')
 const chalk = require('chalk')
 const crypto = require('crypto')
+const password = require('./password')
 
 const askConnectorQuestions = function * (env) {
   return yield inquirer.prompt([
@@ -17,7 +18,7 @@ const askConnectorQuestions = function * (env) {
       name: 'password',
       message: 'What is (or will be) the password to this account? (min. 5 characters)',
       validate: (a) => (a.length >= 5),
-      default: crypto.randomBytes(18).toString('base64') }
+      default: password() }
   ])
 }
 

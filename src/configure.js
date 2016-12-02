@@ -4,6 +4,7 @@ const co = require('co')
 const chalk = require('chalk')
 const crypto = require('crypto')
 const base64url = require('base64url')
+const password = require('./password')
 
 const askConnectorQuestions = require('../src/connector.js')
 const currency = require('../src/currency.js')
@@ -76,7 +77,7 @@ module.exports = co.wrap(function * (output) {
   env.CLIENT_PUBLIC_PORT = '443'
   env.CLIENT_TITLE = title
   env.LEDGER_ADMIN_USER = 'admin'
-  env.LEDGER_ADMIN_PASS = base64url(crypto.randomBytes(18))
+  env.LEDGER_ADMIN_PASS = password()
   env.LEDGER_CURRENCY_CODE = wallet.currency
   env.LEDGER_CURRENCY_SYMBOL = currency[wallet.currency] || wallet.currency
   env.LEDGER_ILP_PREFIX = prefix
