@@ -19,11 +19,11 @@ const handle = (p) => {
 }
 
 commander
-  .version('7.0.1')
-  .command('key')
-  .description('generate a public key from a secret (or from a random string)')
-  .action(() => {
-    handle(co(key))
+  .version('8.0.0')
+  .command('key [file]')
+  .description('generate a public key from api secret')
+  .action((file) => {
+    handle(co.wrap(key)(file))
   })
 
 commander
@@ -59,7 +59,7 @@ const argc = argv.slice(2).length
 if (!argc) {
   commander.outputHelp()
   process.exit(1)
-} else if (argc === 1 && argv[2] !== 'key') {
+} else if (argc === 1) {
   console.info(chalk.grey('Using "env.list" as default file.'))
   argv.push('env.list')
 }

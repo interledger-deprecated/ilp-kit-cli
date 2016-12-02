@@ -9,6 +9,7 @@ const currencies = require('./currency')
 const path = require('path')
 const fs = require('fs')
 const parse = require('./parse')
+const getSecret = require('./secret')
 const printTrustlines = require('./trustlines')
 
 const printInfo = (s) => {
@@ -26,6 +27,8 @@ module.exports = co.wrap(function * (output) {
     console.error('"' + output + '" does not yet exist. Run \'configure\' to create it.')
     process.exit(1)
   }
+
+  const secret = getSecret(output)
   
   yield parse(output, function * (variable, value) {
     if (variable === 'CONNECTOR_LEDGERS') {
@@ -39,7 +42,7 @@ module.exports = co.wrap(function * (output) {
         process.exit(1)
       }
       
-      printTrustlines(trustlines, ledgers)
+      printTrustlines(trustlines, ledgers, secret)
 
       const answers = yield inquirer.prompt([
         { type: 'list',
