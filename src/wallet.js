@@ -37,7 +37,7 @@ const askWalletQuestions = function * (env) {
       name: 'country',
       message: 'What is your country code?',
       validate: valid.validateCountry,
-      default: env.LEDGER_CURRENCY_CODE || 'US' },
+      default: (env.LEDGER_ILP_PREFIX || '').split('.')[0].toUpperCase() || 'US' },
 
     { type: 'confirm',
       name: 'github',

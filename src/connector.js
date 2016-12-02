@@ -11,7 +11,7 @@ const askConnectorQuestions = function * (env) {
       name: 'username',
       message: 'What\'s your username (or what username will you have) on your own ledger?',
       validate: valid.validateAccount,
-      default: 'me' },
+      default: (env.LEDGER_RECOMMENDED_CONNECTORS || '').split(',')[0] || 'me' },
 
     // connector password
     { type: 'input',
