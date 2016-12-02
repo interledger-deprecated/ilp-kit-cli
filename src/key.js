@@ -1,7 +1,7 @@
 'use strict'
 
 const fs = require('fs')
-const sodium = require('chloride')
+const sodium = require('sodium-prebuilt').api
 const co = require('co')
 const inquirer = require('inquirer')
 const crypto = require('crypto')
