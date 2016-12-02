@@ -1,6 +1,6 @@
 {
   "name": "ilp-kit-cli",
-  "version": "8.0.0",
+  "version": "8.1.0",
   "description": "Simple tools start ILP Kit",
   "main": "index.js",
   "dependencies": {
