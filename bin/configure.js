@@ -19,7 +19,7 @@ const handle = (p) => {
 }
 
 commander
-  .version('8.0.0')
+  .version('9.0.0')
   .command('key [file]')
   .description('generate a public key from api secret')
   .action((file) => {
