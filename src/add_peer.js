@@ -4,7 +4,7 @@ const inquirer = require('inquirer')
 const crypto = require('crypto')
 const valid = require('./validate')
 const chalk = require('chalk')
-const sodium = require('chloride')
+const sodium = require('sodium-prebuilt').api
 const co = require('co')
 const base64url = require('base64url')
 const currencies = require('./currency')
@@ -61,10 +61,15 @@ module.exports = co.wrap(function * (output) {
       default: '10' }
   ])
 
-  const token = base64url(sodium.crypto_scalarmult(
+  const shared = sodium.crypto_scalarmult(
     sodium.crypto_hash_sha256(base64url.toBuffer(secret)),
     base64url.toBuffer(answers.publicKey)
-  ))
+  )
+  const token = base64url(
+    crypto.createHmac('sha256', shared)
+      .update('token', 'ascii')
+      .digest()
+  )
   
   const ledgerName = 'peer.' + token.substring(0, 5) + '.' + answers.currency.toLowerCase() + '.'
   const ledger = {
