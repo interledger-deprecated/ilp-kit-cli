@@ -83,6 +83,7 @@ module.exports = co.wrap(function * (output) {
       broker: answers.broker,
       maxBalance: answers.maxBalance,
       store: path.join(process.cwd(), 'store.' + ledgerName + 'db'),
+      currency: answers.currency,
       info: {
         currencyCode: answers.currency,
         currencySymbol: currencies[answers.currency] || answers.currency,
