@@ -56,7 +56,7 @@ commander
 
 const argv = process.argv
 const argc = argv.slice(2).length
-if (!argc) {
+if (!argc || ['configure', 'key', 'peer', 'depeer', 'list'].indexOf(argv[2]) < 0) {
   commander.outputHelp()
   process.exit(1)
 } else if (argc === 1) {

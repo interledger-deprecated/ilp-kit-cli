@@ -34,7 +34,7 @@ module.exports = co.wrap(function * (output) {
   const answers = yield inquirer.prompt([
     { type: 'input',
       name: 'name',
-      message: 'What would you like to name this trustline? (optional)' },
+      message: 'What would you like to name this trustline? (optional alias shown when modifying peers)' },
 
     { type: 'input',
       name: 'broker',

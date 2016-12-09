@@ -6,7 +6,6 @@ const crypto = require('crypto')
 const base64url = require('base64url')
 const password = require('./password')
 
-const askConnectorQuestions = require('../src/connector.js')
 const currency = require('../src/currency.js')
 const askWalletQuestions = require('../src/wallet.js')
 const parse = require('../src/parse.js')
@@ -38,11 +37,7 @@ module.exports = co.wrap(function * (output) {
   printInfo('This section covers the configuration of your ledger and web UI. If you want to configure advanced options like mailgun configuration (to send verification emails) or github oath login, edit ' + output + ' after running this program.')
   const wallet = yield askWalletQuestions(env)
 
-  printHeader('Connector Configuration')
-  printInfo('Your connector is what gets you linked up to the rest of the Interledger. You\'ll need an account on at least one ledger that isn\'t your own in order for your connector to trade between the two ledgers. If you don\'t have any accounts right now then that\'s ok; you can enter placeholder credentials and register the account later.')
-
   const ledgers = (env.CONNECTOR_LEDGERS && JSON.parse(env.CONNECTOR_LEDGERS)) || {}
-  const connector = yield askConnectorQuestions(env)
   const name = wallet.name
   const title = name.charAt(0).toUpperCase() + name.split('').slice(1).join('')
   const prefix = wallet.country.toLowerCase()
@@ -54,8 +49,8 @@ module.exports = co.wrap(function * (output) {
     currency: wallet.currency,
     plugin: 'ilp-plugin-bells',
     options: {
-      account: 'https://' + wallet.hostname + '/ledger/accounts/' + connector.username,
-      password: connector.password
+      account: 'https://' + wallet.hostname + '/ledger/accounts/' + wallet.username,
+      password: wallet.password
     }
   }  
 
@@ -92,7 +87,7 @@ module.exports = co.wrap(function * (output) {
   env.CONNECTOR_MAX_HOLD_TIME = env.CONNECTOR_MAX_HOLD_TIME || '100'
   env.CONNECTOR_AUTOLOAD_PEERS = env.CONNECTOR_AUTOLOAD_PEERS || 'true'
   env.CONNECTOR_PORT = env.CONNECTOR_PORT || '4000'
-  env.LEDGER_RECOMMENDED_CONNECTORS = connector.username
+  env.LEDGER_RECOMMENDED_CONNECTORS = wallet.username
 
   // write the environment to a docker-compatible env-file
   printInfo('Writing enviroment to "' + output + '"...')
