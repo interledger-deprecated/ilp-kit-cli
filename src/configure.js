@@ -55,7 +55,7 @@ module.exports = co.wrap(function * (output) {
   }  
 
   // assign all the environment variables
-  env.API_DB_URI = wallet.db_uri
+  env.DB_URI = wallet.db_uri
   env.API_EMAIL_SENDER_NAME = title
   env.API_EMAIL_SENDER_ADDRESS = 'ilpkit@' + wallet.hostname
   env.API_GITHUB_CLIENT_ID = wallet.github_id || ''
