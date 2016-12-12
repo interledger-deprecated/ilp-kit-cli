@@ -50,6 +50,7 @@ module.exports = co.wrap(function * (output) {
     plugin: 'ilp-plugin-bells',
     options: {
       account: 'https://' + wallet.hostname + '/ledger/accounts/' + wallet.username,
+      username: wallet.username,
       password: wallet.password
     }
   }  
