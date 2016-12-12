@@ -6,11 +6,11 @@ const password = require('./password')
 
 const askWalletQuestions = function * (env) {
   return yield inquirer.prompt([
-    // API_DB_URI
+    // DB_URI
     { type: 'input',
       name: 'db_uri',
       message: 'What is the address of your postgres DB?',
-      default: env.API_DB_URI || 'postgres://user:pass@localhost/ilpkit' },
+      default: env.DB_URI || 'postgres://user:pass@localhost/ilpkit' },
 
     // domain
     { type: 'input',
