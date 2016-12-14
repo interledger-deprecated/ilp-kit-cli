@@ -75,6 +75,7 @@ module.exports = co.wrap(function * (output) {
   const ledger = {
     currency: answers.currency,
     plugin: 'ilp-plugin-virtual',
+    store: true,
     options: {
       name: answers.name,
       secret: secret,
@@ -82,8 +83,6 @@ module.exports = co.wrap(function * (output) {
       prefix: ledgerName,
       broker: answers.broker,
       maxBalance: answers.maxBalance,
-      store: path.join(process.cwd(), 'store.' + ledgerName + 'db'),
-      currency: answers.currency,
       info: {
         currencyCode: answers.currency,
         currencySymbol: currencies[answers.currency] || answers.currency,
