@@ -83,6 +83,7 @@ module.exports = co.wrap(function * (output) {
       prefix: ledgerName,
       broker: answers.broker,
       maxBalance: answers.maxBalance,
+      currency: answers.currency,
       info: {
         currencyCode: answers.currency,
         currencySymbol: currencies[answers.currency] || answers.currency,
