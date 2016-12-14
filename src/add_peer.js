@@ -38,7 +38,7 @@ module.exports = co.wrap(function * (output) {
 
     { type: 'input',
       name: 'broker',
-      message: 'What MQTT broker will you be using?',
+      message: 'What MQTT broker will this trustline use?',
       validate: (a) => !!(a.length),
       // TODO: should this have a real test broker in here?
       default: 'mqtt://broker.hivemq.com:1883'},
@@ -50,7 +50,7 @@ module.exports = co.wrap(function * (output) {
 
     { type: 'input',
       name: 'currency',
-      message: 'What is your currency code?',
+      message: 'What is the currency code of this trustline?',
       validate: valid.validateCurrency,
       default: 'USD' },
 
