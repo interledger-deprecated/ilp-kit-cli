@@ -94,7 +94,7 @@ const askWalletQuestions = function * (env) {
     // connector password
     { type: 'input',
       name: 'password',
-      message: 'What or will the password to this account be? (min. 5 characters)',
+      message: 'What will the password to this account be? (min. 5 characters)',
       validate: (a) => (a.length >= 5),
       default: (
         (env.CONNECTOR_LEDGERS && JSON.parse(env.CONNECTOR_LEDGERS)[env.LEDGER_ILP_PREFIX] &&
