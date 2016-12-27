@@ -90,6 +90,8 @@ module.exports = co.wrap(function * (output) {
   env.CONNECTOR_PORT = env.CONNECTOR_PORT || '4000'
   env.LEDGER_RECOMMENDED_CONNECTORS = wallet.username
 
+  env.ILP_KIT_CLI_VERSION = require('../package.json').version
+
   // write the environment to a docker-compatible env-file
   printInfo('Writing enviroment to "' + output + '"...')
   fs.writeFileSync(
