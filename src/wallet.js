@@ -81,7 +81,7 @@ const askWalletQuestions = function * (env) {
     { type: 'input',
       name: 'mailgun_domain',
       message: 'What is your mailgun domain?',
-      default: env.API_MAILGUN_API_KEY || 'example.com',
+      default: env.API_MAILGUN_DOMAIN || 'example.com',
       when: (answers) => answers.mailgun },
 
     // connector account
