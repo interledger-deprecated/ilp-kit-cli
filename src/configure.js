@@ -18,6 +18,9 @@ const printHeader = (s) => {
 const printInfo = (s) => {
   console.info(chalk.gray(s))
 }
+const printWarning = (s) => {
+  console.info(chalk.red(s))
+}
 
 module.exports = co.wrap(function * (output) {
   const env = {}
@@ -26,7 +29,7 @@ module.exports = co.wrap(function * (output) {
     console.error('Missing output file. Use \'--help\' for options.')
     process.exit(1)
   } else if (fs.existsSync(output)) {
-    printInfo('Will load defaults from "' + output + '", then overwrite. Cancel now if you aren\'t ok with that.')
+    printWarning('Will load defaults from "' + output + '", then overwrite. Make sure you have a backup.')
     yield parse(output, function * (key, value) {
       env[key] = value
     }, true) // don't modify the file
@@ -37,7 +40,7 @@ module.exports = co.wrap(function * (output) {
   printInfo('This section covers the configuration of your ledger and web UI. If you want to configure advanced options like mailgun configuration (to send verification emails) or github oath login, edit ' + output + ' after running this program.')
   const wallet = yield askWalletQuestions(env)
 
-  const ledgers = (env.CONNECTOR_LEDGERS && JSON.parse(env.CONNECTOR_LEDGERS)) || {}
+  const ledgers = {}
   const name = wallet.name
   const title = name.charAt(0).toUpperCase() + name.split('').slice(1).join('')
   const prefix = wallet.country.toLowerCase()
