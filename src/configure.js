@@ -10,6 +10,18 @@ const currency = require('../src/currency.js')
 const askWalletQuestions = require('../src/wallet.js')
 const parse = require('../src/parse.js')
 
+const backupFile = (original) => {
+  const now = new Date()
+  return original +
+    '.' + now.getFullYear() +
+    '-' + now.getMonth() +
+    '-' + now.getDate() +
+    '-' + now.getHours() +
+    '-' + now.getMinutes() +
+    '-' + now.getSeconds() +
+    '.bak'
+}
+
 // Text formatting functions
 const printHeader = (s) => {
   console.log()
@@ -29,7 +41,11 @@ module.exports = co.wrap(function * (output) {
     console.error('Missing output file. Use \'--help\' for options.')
     process.exit(1)
   } else if (fs.existsSync(output)) {
-    printWarning('Will load defaults from "' + output + '", then overwrite. Make sure you have a backup.')
+    const bak = backupFile(output)
+
+    printWarning('Backing up ' + output + ' at ' + bak)
+    fs.createReadStream(output).pipe(fs.createWriteStream(bak))
+
     yield parse(output, function * (key, value) {
       env[key] = value
     }, true) // don't modify the file
