@@ -82,24 +82,7 @@ const askWalletQuestions = function * (env) {
       name: 'mailgun_domain',
       message: 'What is your mailgun domain?',
       default: env.API_MAILGUN_DOMAIN || 'example.com',
-      when: (answers) => answers.mailgun },
-
-    // connector account
-    { type: 'input',
-      name: 'username',
-      message: 'What username will your connector use on your ledger? (should NOT be admin)',
-      validate: (a) => (valid.validateAccount(a) && a !== 'admin'),
-      default: (answers) => ((env.LEDGER_RECOMMENDED_CONNECTORS || '').split(',')[0] || answers.name) },
-
-    // connector password
-    { type: 'input',
-      name: 'password',
-      message: 'What will the password to this account be? (min. 5 characters)',
-      validate: (a) => (a.length >= 5),
-      default: (
-        (env.CONNECTOR_LEDGERS && JSON.parse(env.CONNECTOR_LEDGERS)[env.LEDGER_ILP_PREFIX] &&
-        JSON.parse(env.CONNECTOR_LEDGERS)[env.LEDGER_ILP_PREFIX].options.password)
-        || password()) }
+      when: (answers) => answers.mailgun }
   ])
 }
 
