@@ -64,13 +64,20 @@ module.exports = co.wrap(function * (output) {
     + '.' + name.toLowerCase()
     + '.'
 
+  const connectorUsername = (env.LEDGER_RECOMMENDED_CONNECTORS || '').split(',')[0] || 'connector'
+  const connectorPassword = (
+    env.CONNECTOR_LEDGERS &&
+    JSON.parse(env.CONNECTOR_LEDGERS)[env.LEDGER_ILP_PREFIX] &&
+    JSON.parse(env.CONNECTOR_LEDGERS)[env.LEDGER_ILP_PREFIX].options.password
+  ) || password()
+
   ledgers[prefix] = {
     currency: wallet.currency,
     plugin: 'ilp-plugin-bells',
     options: {
-      account: 'https://' + wallet.hostname + '/ledger/accounts/' + wallet.username,
-      username: wallet.username,
-      password: wallet.password
+      account: 'https://' + wallet.hostname + '/ledger/accounts/' + connectorUsername,
+      username: connectorUsername,
+      password: connectorPassword
     }
   }  
 
@@ -107,7 +114,7 @@ module.exports = co.wrap(function * (output) {
   env.CONNECTOR_MAX_HOLD_TIME = env.CONNECTOR_MAX_HOLD_TIME || '100'
   env.CONNECTOR_AUTOLOAD_PEERS = env.CONNECTOR_AUTOLOAD_PEERS || 'true'
   env.CONNECTOR_PORT = env.CONNECTOR_PORT || '4000'
-  env.LEDGER_RECOMMENDED_CONNECTORS = wallet.username
+  env.LEDGER_RECOMMENDED_CONNECTORS = connectorUsername
 
   env.ILP_KIT_CLI_VERSION = require('../package.json').version
 
