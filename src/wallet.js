@@ -3,21 +3,23 @@ const crypto = require('crypto')
 const valid = require('./validate')
 const chalk = require('chalk')
 const password = require('./password')
+const base64url = require('base64url')
+const randomHost = require('./host')
 
 const askWalletQuestions = function * (env) {
   return yield inquirer.prompt([
     // DB_URI
     { type: 'input',
       name: 'db_uri',
-      message: 'What is the address of your postgres DB?',
-      default: env.DB_URI || 'postgres://user:pass@localhost/ilpkit' },
+      message: 'What is the address of your ILP Kit\'s DB?',
+      default: env.DB_URI || 'sqlite://ilp-kit.db' },
 
     // domain
     { type: 'input',
       name: 'hostname',
       message: 'What is the hostname that you\'ll be running on?',
       validate: valid.validatePeers,
-      default: env.CLIENT_HOST || 'red.ilpdemo.org' },
+      default: env.CLIENT_HOST || randomHost() },
 
     // name
     { type: 'input',
