@@ -5,6 +5,7 @@ const chalk = require('chalk')
 const crypto = require('crypto')
 const base64url = require('base64url')
 const password = require('./password')
+const DB_URI_REGEX = /^postgres:\/\/(.+?):(.+?)@localhost\/(.+)$/
 
 const currency = require('../src/currency.js')
 const askWalletQuestions = require('../src/wallet.js')
@@ -81,8 +82,16 @@ module.exports = co.wrap(function * (output) {
     }
   }  
 
+  // if the DB_URI in the existing env.list isn't a postgres database on
+  // localhost, then don't modify the existing URI. otherwise, use the answers
+  // that the user gave (which default to the current URI components.
+  env.DB_URI = (env.DB_URI && !env.DB_URI.match(DB_URI_REGEX))
+    ? env.DB_URI
+    : ('postgres://' + encodeUriComponent(wallet.db_user) + ':' +
+       encodeUriComponent(wallet.db_password) +
+       '@localhost/' + wallet.db_name)
+
   // assign all the environment variables
-  env.DB_URI = wallet.db_uri
   env.API_EMAIL_SENDER_NAME = title
   env.API_EMAIL_SENDER_ADDRESS = 'ilpkit@' + wallet.hostname
   env.API_GITHUB_CLIENT_ID = wallet.github_id || ''

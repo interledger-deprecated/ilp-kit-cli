@@ -3,14 +3,34 @@ const crypto = require('crypto')
 const valid = require('./validate')
 const chalk = require('chalk')
 const password = require('./password')
+const DB_URI_REGEX = /^postgres:\/\/(.+?):(.+?)@localhost\/(.+)$/
 
 const askWalletQuestions = function * (env) {
+  // if someone's using an unusual postgres URI, then
+  // we don't want to overwrite that by accident.
+  const noUri = !env.DB_URI
+  const match = env.DB_URI && env.DB_URI.match(DB_URI_REGEX)
+  const [ , dbUser, dbPassword, dbName ] = match || []
+
   return yield inquirer.prompt([
     // DB_URI
     { type: 'input',
-      name: 'db_uri',
-      message: 'What is the address of your postgres DB?',
-      default: env.DB_URI || 'postgres://user:pass@localhost/ilpkit' },
+      name: 'db_user',
+      message: 'What is your username for postgres?',
+      when: () => (noUri || match),
+      default: dbUser || process.env.USER },
+
+    { type: 'input',
+      name: 'db_password',
+      message: 'What is your password for postgres?',
+      when: () => (noUri || match),
+      default: dbPassword },
+
+    { type: 'input',
+      name: 'db_name',
+      message: 'What is the name of your postgres database?',
+      when: () => (noUri || match),
+      default: dbName || 'ilp-kit' },
 
     // domain
     { type: 'input',
