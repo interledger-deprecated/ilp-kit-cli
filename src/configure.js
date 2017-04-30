@@ -87,8 +87,8 @@ module.exports = co.wrap(function * (output) {
   // that the user gave (which default to the current URI components.
   env.DB_URI = (env.DB_URI && !env.DB_URI.match(DB_URI_REGEX))
     ? env.DB_URI
-    : ('postgres://' + encodeUriComponent(wallet.db_user) + ':' +
-       encodeUriComponent(wallet.db_password) +
+    : ('postgres://' + encodeURIComponent(wallet.db_user) + ':' +
+       encodeURIComponent(wallet.db_password) +
        '@localhost/' + wallet.db_name)
 
   // assign all the environment variables
